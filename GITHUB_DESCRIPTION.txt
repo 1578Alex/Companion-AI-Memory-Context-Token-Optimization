@@ -1,1 +1,1 @@
-陪伴 AI 记忆上下文 token优化：借鉴冷热分层与线索唤回，减少长对话的重复上下文加载。中英双语，面向 Coopanion；节省比例待实测。 / Bilingual tiered-memory proposal; savings not yet measured.
+陪伴 AI 聊久了，旧对话越背越多。我想让它把常聊的放手边，久远的先收好；你一提“西安那次”，它再找回来。给 Coopanion 省点上下文和 Token。/ A lighter memory plan for AI companions.

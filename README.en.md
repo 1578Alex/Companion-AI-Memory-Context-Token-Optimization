@@ -2,9 +2,9 @@
 
 **中文：[陪伴 AI 记忆上下文 token优化](README.md)**
 
-This proposal draws on familiar aspects of human memory: recent and repeated information is easier to access, while older details can be recovered from a useful cue. It targets the growing input size, latency, and token consumption of long-running AI conversations. [Coopanion](https://github.com/Pal-AI-Lab/Coopanion) is the intended integration target: keep a small relevant working set, move infrequent memories into recoverable cold storage, and retrieve old details only from a user's cue.
+An AI companion can end up carrying the same old conversations into every new chat. Replies get slower, and the token bill keeps growing. The idea here is simple: keep the things you talk about often close at hand, put older memories away, and find them again when you give a clue—“Remember that time in Xi'an?”
 
-This repository contains a design, prompts, example policy and acceptance scenarios. **Version 0.1 is a proposal and prompt package. It has not been integrated into Coopanion or measured in production.** The tiered-memory and forgetting concepts have prior art; see [References](REFERENCES.en.md).
+I wrote this with [Coopanion](https://github.com/Pal-AI-Lab/Coopanion) in mind. The repo has the plan, prompts, and made-up examples. It's still a proposal, not a feature running in Coopanion. The memory ideas build on earlier work; see [References](REFERENCES.en.md).
 
 ## The memory model
 
@@ -39,13 +39,13 @@ These are illustrative parameters to test, not existing Coopanion settings or pr
 
 Unused allowances stay unused. The system prompt, tool definitions, current user message, tool transaction, output reserve, and protocol overhead count toward the full request separately. A model-specific token counter is required to verify a hard token limit.
 
-## Estimated savings versus measured savings
+## How many tokens could it save?
 
-**As of 2026-10-25, there is no Coopanion measurement for this proposal. No “measured savings up to X%” claim is supported.** A smaller input also does not imply an equal reduction in latency or total cost.
+We don't have a real number yet. As of 2026-10-25, this hasn't been built into Coopanion and measured, so I wouldn't call any percentage “tested savings.”
 
-Here is a calculation example using *assumed* inputs: suppose a baseline request contains 8,000 tokens of fixed instructions and tool schemas, 20,000 of repeated history, and 2,000 for the current message: **30,000 input tokens**. Suppose the proposed request contains the same 8,000 fixed tokens, a 2,000-token recent window, a 1,600-token memory snapshot, and the same 2,000-token current message: **13,600 input tokens**. The illustrative input reduction is `(30,000 − 13,600) / 30,000 ≈ 54.7%`, or **about 55% in this example only**. It is not a measured Coopanion saving, bill reduction, or speedup.
+For a rough example, imagine one request carries 8,000 tokens of fixed instructions and tools, 20,000 of old conversation, and 2,000 for the current message: **30,000 input tokens**. Keep the same fixed part and current message, but use 2,000 tokens of recent chat and a 1,600-token memory snapshot: **13,600 input tokens**. That is `(30,000 − 13,600) / 30,000 ≈ 54.7%`, or **about 55% fewer input tokens in this made-up case**. It says nothing yet about the real app's bill or speed.
 
-An actual test must include all model turns, cache-hit pricing, outputs, tool results, retrieval, and maintenance. Compare the current version, a recent-window-only variant, and this proposal under the same replay. Report input tokens, total cost, latency, and memory accuracy per user interaction. See the [evaluation plan](docs/evaluation.en.md). Until then the publication claim is **“Designed to reduce repeated context; savings remain to be measured.”**
+To find the real number, we'd also count cached input, extra tool calls, model outputs, and the work of finding and updating memories. Then we'd compare cost, response time, and whether it remembers the right things. The [evaluation plan](docs/evaluation.en.md) spells out that test.
 
 ## How to use this package
 
