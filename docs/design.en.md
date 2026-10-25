@@ -4,7 +4,9 @@ This design limits what the model sees **in each request** while preserving reco
 
 ## 1. Separate storage from visibility
 
-Every accepted memory is stored as a record with provenance. `tier` controls its current scheduling position. Recent messages remain in the log, but only a bounded window is sent to the model. A first implementation could use SQLite or files plus an index; it does not require a dedicated vector database. This repository contains no running storage implementation.
+The proposed host-managed cold archive keeps the full text of every user and assistant conversational turn, including ordinary greetings, unless the user explicitly deletes it. An accepted memory record is a separate, shorter card derived from and linked to that source. `tier` schedules the card; it does not decide whether the original conversation survives. A bounded recent window and selected cards enter the model request. A first implementation could use SQLite or files plus an index; it does not require a dedicated vector database. This repository contains no running storage implementation.
+
+For existing Coopanion conversations, integration must migrate the available original history into that archive before replacing any session or handoff path. A missing historic source cannot be reconstructed from a summary. Complete retention applies to recorded dialogue, subject to explicit deletion; it is not a promise that every old detail can always be found or interpreted correctly.
 
 | Tier | Included by default | When it leaves the current request | Does the archive keep it? |
 | --- | --- | --- | --- |
@@ -13,7 +15,7 @@ Every accepted memory is stored as a record with provenance. `tier` controls its
 | cold | No; its bodies, tag lists, and per-record index are never inserted automatically | A temporary retrieval authorized by a user cue, or a qualified promotion | Yes |
 | recalled | Not a new persistent tier: temporarily visible excerpts from cold records | Topic ends, authorization expires, or the budget excludes them | Original record remains cold |
 
-`status` is independent of `tier`: `valid / superseded / deleted`. A corrected fact becomes superseded and is excluded from normal recall. An explicit deletion removes the body, indexes, summaries, derived copies, and caches so it cannot be recalled. A minimal deletion marker may be retained solely to stop re-import from old logs; backup cleanup follows the published retention period.
+`status` is independent of `tier`: `valid / superseded / deleted`. A corrected fact becomes superseded and is excluded from normal recall. An explicit deletion of a conversation or memory also removes the affected original dialogue text, indexes, summaries, derived copies, and caches so it cannot be recalled or reimported. A minimal deletion marker may be retained solely to stop re-import from old logs; backup cleanup follows the published retention period.
 
 A “current task” must be something the user has explicitly said is ongoing, with a review deadline. Old plans do not remain ongoing forever. Pinned facts and current tasks must not become a second, unbounded `PARTNER.md` outside the memory budget.
 
@@ -33,7 +35,7 @@ See the [synthetic records](../examples/memories.en.json) for suggested fields.
 | facets | Type, event time, place, person, object, and topic indexes; see [logical partitions](cold-storage-index.en.md) |
 | tier / status / supersedes | Scheduling tier, validity, and corrected prior version ID |
 
-Retain evidence from the original message whenever a model generates a summary. Do not write an uncertain extraction as a certain fact. Assistant guesses, fiction, quoted material, and another person's statements must not become the current user's experiences. Isolate records by owner and scope in multi-user or multi-persona deployments; a desktop event cannot masquerade as a user message.
+Keep each original dialogue turn in the cold transcript archive even when it never produces a fact card. A card's `source_refs` point back to archived messages; reading those full messages for the conversation model still requires the user's cue and the recall budget. Retain evidence from the original message whenever a model generates a summary. Do not write an uncertain extraction as a certain fact. Assistant guesses, fiction, quoted material, and another person's statements must not become the current user's experiences. Isolate transcripts and cards by owner and scope in multi-user or multi-persona deployments; a desktop event cannot masquerade as a user message.
 
 On repeated mentions of the same fact, update its statistics and keep at most one current summary instead of appending synonyms. Similar events at different times can remain separate records under one topic. Link corrected versions. “I used to live in Hangzhou; now I live in Suzhou” retains the historical time and the current fact rather than choosing one city arbitrarily.
 
@@ -60,7 +62,7 @@ This is a tunable engineering starting point, not a psychological law. Heat can 
 
 ### State transitions
 
-1. A new, source-backed record can be a hot candidate for up to seven days. Being a candidate does not mean being inserted into every request. Transient small talk need not be persisted.
+1. A new, source-backed fact card can be a hot candidate for up to seven days. Being a candidate does not mean being inserted into every request. Transient small talk stays in the original dialogue archive but need not create a separate fact card.
 2. After that candidate period, move a hot record to cold if `heat < 0.30`. Also move it to cold if it has had no qualifying mention for more than 14 days and is not a valid ongoing item. Recompute when the host prepares a request.
 3. Keep at most 64 records in the hot pool. If capacity is exceeded, retain candidates using heat and time of latest qualifying mention; archive the rest without deleting them. Select at most eight hot records for any request.
 4. Promote cold back to hot only after at least three substantive mentions in independent interactions across at least two distinct dates within seven days, or when the user explicitly resumes the item as ongoing. A single cued recall leaves it cold.
@@ -124,7 +126,7 @@ This is a logical sequence. Actual message roles and ordering must comply with t
 ### Required constraints
 
 - `memory_snapshot` replaces the previous snapshot; do not append another copy every turn. The same fact should not be repeated in `PARTNER.md`, recent summaries, tool results, and the snapshot.
-- The original history may be persisted but cannot be sent in full without filtering. Old recall tool results and the assistant's retellings of old facts can bypass cold storage. Filter the outbound projection using provenance, or replace them with verified, bounded current-task state.
+- The full user-and-assistant dialogue history must remain in the host-controlled cold archive, except for explicitly deleted material, but cannot be sent in full without filtering. Old recall tool results and the assistant's retellings of old facts can bypass cold storage. Filter the outbound projection using provenance, or replace them with verified, bounded current-task state.
 - Do not split a live tool call from its result or drop reasoning fields required by the provider for the current turn. Rebuild context at a safe tool-transaction boundary when old memories must be removed. If the budget still cannot fit a valid transaction, stop a new batch or explicitly report the limit rather than sending an invalid protocol sequence.
 - Cold content already in a live tool transaction may be used only within that transaction and its valid topic permission. After a topic change or expiry, finish the old transaction before processing the new user event through a clean projection. Do not extend permission indefinitely just to keep a tool loop going.
 - Apply cold-access policy to every reachable path, including generic `read_file`, search, and command execution. Prefer a host-managed archive behind a controlled retrieval adapter. Folding a directory listing or renaming a directory `archive` does not isolate it.

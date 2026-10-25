@@ -9,7 +9,7 @@ This review is pinned to the following revisions. Verify changes in newer upstre
 
 ## 1. Intended change
 
-Keep conversational continuity while sending only a bounded recent window and a small, selected set of memories in each model request. The full history can remain on local storage without being sent on every turn. A model's promise to “forget,” compress, or read less is not an enforcement mechanism.
+Keep conversational continuity while sending only a bounded recent window and a small, selected set of memories in each model request. The proposed cold archive must retain the complete text of every user and assistant conversational turn, including turns that never produce a memory card, unless the user explicitly deletes them. Store that history locally; do not send it on every turn. A model's promise to “forget,” compress, or read less is not an enforcement mechanism.
 
 The proposed tiers are **pinned** for explicitly retained essentials, **hot** for currently useful memories supported by user evidence, and **cold** for the remaining history. Cold retrieval requires a usable cue from the current user's input. Environmental events, timers, the model's own statements, repeated tool outputs, and the model rereading a record do not independently increase its heat.
 
@@ -72,7 +72,7 @@ Count tokens according to the chosen model and provider's actual serialization. 
 
 ## 4. Every outbound path needs the same projection
 
-Before each model call, the host builds a temporary outbound view from locally stored records. The raw history and audit record remain on disk. All routes that send material to the model must use this view.
+Before each model call, the host builds a temporary outbound view from locally stored records. The complete raw dialogue stays in the host-controlled cold archive, with memory cards and indexes pointing to its source turns. Explicitly deleted text is removed from the archive and derived stores. All routes that send material to the model must use the filtered view. Existing history needs migration before old session or handoff paths are replaced; summaries alone cannot recover missing raw turns.
 
 1. **Stable instructions.** Keep persona, safety rules, and tool protocol. Partner facts cannot grow without bound inside `PARTNER.md` in the system prefix; map allowable persistent facts to pinned and count them within 160 tokens. Avoid injecting the same fact from the prefix, hot records, and old messages.
 2. **Recent window.** Select at most 2,000 tokens of completed, relevant recent conversation. Preserve necessary user statements, replies, and paired tool calls/results; do not split an active call midway. An in-progress tool exchange and provider-required current reasoning are needed for task continuity and must be accounted for under a separate, bounded current-task allowance. If the full budget cannot fit them, stop accepting new batches, report the limit, or finish the existing exchange at a safe boundary. Never send a broken protocol sequence.
@@ -89,6 +89,7 @@ Before each model call, the host builds a temporary outbound view from locally s
 
 | Area | Current role | Proposed new responsibility |
 | --- | --- | --- |
+| Dialogue archive and session storage | Persist sessions and historical messages | Keep all user and assistant turns as original cold source material; link selected cards to source IDs, support deletion and migration, and never replay the archive wholesale |
 | Coopanion Persona and partner profile | Persona, partner data, file memory, Git versions | Add tiers, provenance, and validity; cap partner facts in the prefix under pinned |
 | Cortico outbound request construction | Build context from session and synthetic opening | Recent window, memory budget, cold admission, old-content exclusion, deduplication, and paired-tool projection |
 | Cormini handoff | Fold, save, and inject notes into a new session | Keep the archive, but send selected content only through the shared selector |

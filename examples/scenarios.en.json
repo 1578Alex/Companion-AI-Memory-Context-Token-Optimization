@@ -434,6 +434,41 @@
         "both_management_actions_applied": true,
         "effective_mentions_added_lte": 1
       }
+    },
+    {
+      "id": "S31",
+      "name": "Cold storage retains the original text of every dialogue turn",
+      "setup": "Archive the three fictional dialogues in dialogue-archive.en.json, including the greeting and music chat with no memory card. Then send an ordinary message with no past-event cue; afterward the user explicitly deletes the Xi’an camera exchange.",
+      "input": {
+        "event_type": "dialogue_archive_and_explicit_deletion_sequence"
+      },
+      "expected": {
+        "archived_event_ids_before_delete": [
+          "u-m-xian-camera",
+          "a-xian-camera",
+          "u-hello",
+          "a-hello",
+          "u-music",
+          "a-music"
+        ],
+        "unselected_dialogue_ids_retained": [
+          "d-greeting-2026",
+          "d-music-2026"
+        ],
+        "cold_archive_sent_wholesale_without_cue": false,
+        "deleted_dialogue_id": "d-xian-camera-2026",
+        "deleted_event_ids": [
+          "u-m-xian-camera",
+          "a-xian-camera"
+        ],
+        "remove_deleted_dialogue_from_index": true,
+        "remaining_event_ids": [
+          "u-hello",
+          "a-hello",
+          "u-music",
+          "a-music"
+        ]
+      }
     }
   ]
 }

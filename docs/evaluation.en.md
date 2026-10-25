@@ -35,6 +35,7 @@ Locally estimated component tokens help attribute cost; provider usage is the so
 | A single place cue locates a range, then a new cue narrows it | S23/S24/S26 | Facet index, candidate cards, actual query conditions |
 | Event time differs from storage time; facets do not copy records or multiply budgets | S25/S27/S28 | Date filter, ID deduplication, global candidate and card cap |
 | Visibility restrictions take priority; restriction removal and task completion are expressible | S29/S30 | `recall_only`, pinned, ongoing status, and source |
+| Keep both sides of every conversation, including turns without a card; clear originals and indexes on explicit deletion | S31 | Cold archive, uncarded chat, outbound request, deletion result |
 
 Additional edge cases: exactly reaching a token cap, one oversized record, scores on either side of a heat threshold, 7/14/30-day boundaries, cross-timezone dates, an oversized current user message, extractor failure, idempotent retries, deletion during an active tool exchange, and expiry of an ongoing task's review date. Use a controllable clock instead of real waiting.
 

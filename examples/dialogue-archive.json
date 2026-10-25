@@ -1,0 +1,102 @@
+{
+  "notice": "虚构的完整对话归档示例，不是真实用户数据或已经运行的 Coopanion 结果。冷仓库保留每轮用户与助手原文；记忆卡仅为索引和有限调用的派生资料。",
+  "owner_id": "demo-user",
+  "scope_id": "demo-companion",
+  "archive_rule": "retain_all_user_and_assistant_dialogue_messages_except_explicit_deletion",
+  "dialogues": [
+    {
+      "dialogue_id": "d-xian-camera-2026",
+      "linked_memory_ids": [
+        "m-xian-camera"
+      ],
+      "facets": {
+        "types": [
+          "experience",
+          "purchase"
+        ],
+        "occurred_time": {
+          "start": "2019-10-01",
+          "end": "2019-10-31",
+          "precision": "month"
+        },
+        "places": [
+          "CN-Xian"
+        ],
+        "people": [],
+        "objects": [
+          "film_camera"
+        ],
+        "topics": [
+          "travel",
+          "photography"
+        ]
+      },
+      "messages": [
+        {
+          "event_id": "u-m-xian-camera",
+          "role": "user",
+          "occurred_at": "2026-01-10T09:00:00+08:00",
+          "text": "2019年十月去西安旅行的时候，我买了一台胶片相机。"
+        },
+        {
+          "event_id": "a-xian-camera",
+          "role": "assistant",
+          "occurred_at": "2026-01-10T09:00:01+08:00",
+          "text": "你后来有用它拍照片吗？"
+        }
+      ]
+    },
+    {
+      "dialogue_id": "d-greeting-2026",
+      "linked_memory_ids": [],
+      "facets": {
+        "types": [],
+        "occurred_time": null,
+        "places": [],
+        "people": [],
+        "objects": [],
+        "topics": []
+      },
+      "messages": [
+        {
+          "event_id": "u-hello",
+          "role": "user",
+          "occurred_at": "2026-10-22T09:00:00+08:00",
+          "text": "早上好。"
+        },
+        {
+          "event_id": "a-hello",
+          "role": "assistant",
+          "occurred_at": "2026-10-22T09:00:01+08:00",
+          "text": "早上好，今天打算先做什么？"
+        }
+      ]
+    },
+    {
+      "dialogue_id": "d-music-2026",
+      "linked_memory_ids": [],
+      "facets": {
+        "types": [],
+        "occurred_time": null,
+        "places": [],
+        "people": [],
+        "objects": [],
+        "topics": []
+      },
+      "messages": [
+        {
+          "event_id": "u-music",
+          "role": "user",
+          "occurred_at": "2026-10-23T20:00:00+08:00",
+          "text": "今天的音乐听着很放松。"
+        },
+        {
+          "event_id": "a-music",
+          "role": "assistant",
+          "occurred_at": "2026-10-23T20:00:01+08:00",
+          "text": "嗯，哪首歌最合你现在的心情？"
+        }
+      ]
+    }
+  ]
+}

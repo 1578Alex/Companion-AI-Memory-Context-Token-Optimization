@@ -15,7 +15,7 @@ These templates accompany the [design](../docs/design.en.md). They describe mode
 - The conversation model receives a host-selected, bounded `memory_snapshot` with pinned, hot, and recalled records. A full record has `id`, `summary`, `source_refs`, and `created_at`; add `occurred_time` when known. `created_at` is the storage date, not the date of the event. A disambiguation card may contain only an ID, short title, and known distinguishing fields; it shares the recall budget with full excerpts.
 - The host supplies trusted `recall_status` (`disabled / matched / ambiguous / not_found`), `cue_scope`, and `budget_mode` separately from lower-trust record text. A record cannot override these fields.
 - Without host-side filtering, the conversation prompt only guides phrasing. It cannot enforce cold storage, access control, or a hard input budget. Do not invoke a retrieval tool that has not actually been registered.
-- Extractor and cue-router outputs are proposals. Host code validates user-event origin, source, identity, ownership, length, version, and record permissions before writing or retrieving. A failed check must not expand access.
+- Extractor and cue-router outputs are proposals. The host independently archives every user and assistant dialogue turn. The extractor decides only which facts deserve a short memory card; an unselected turn still remains in the raw archive. Host code validates user-event origin, source, identity, ownership, length, version, and record permissions before writing or retrieving. A failed check must not expand access; an explicit user deletion removes the raw turn and its derived copies.
 
 ## Maintenance input
 

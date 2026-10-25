@@ -1,0 +1,102 @@
+{
+  "notice": "A synthetic complete-dialogue archive example, not real user data or a Coopanion runtime result. Cold storage retains the original text of every user and assistant turn; memory cards are derived indexing and bounded-recall material.",
+  "owner_id": "demo-user",
+  "scope_id": "demo-companion",
+  "archive_rule": "retain_all_user_and_assistant_dialogue_messages_except_explicit_deletion",
+  "dialogues": [
+    {
+      "dialogue_id": "d-xian-camera-2026",
+      "linked_memory_ids": [
+        "m-xian-camera"
+      ],
+      "facets": {
+        "types": [
+          "experience",
+          "purchase"
+        ],
+        "occurred_time": {
+          "start": "2019-10-01",
+          "end": "2019-10-31",
+          "precision": "month"
+        },
+        "places": [
+          "CN-Xian"
+        ],
+        "people": [],
+        "objects": [
+          "film_camera"
+        ],
+        "topics": [
+          "travel",
+          "photography"
+        ]
+      },
+      "messages": [
+        {
+          "event_id": "u-m-xian-camera",
+          "role": "user",
+          "occurred_at": "2026-01-10T09:00:00+08:00",
+          "text": "When I traveled to Xi’an in October 2019, I bought a film camera."
+        },
+        {
+          "event_id": "a-xian-camera",
+          "role": "assistant",
+          "occurred_at": "2026-01-10T09:00:01+08:00",
+          "text": "Did you end up taking photos with it?"
+        }
+      ]
+    },
+    {
+      "dialogue_id": "d-greeting-2026",
+      "linked_memory_ids": [],
+      "facets": {
+        "types": [],
+        "occurred_time": null,
+        "places": [],
+        "people": [],
+        "objects": [],
+        "topics": []
+      },
+      "messages": [
+        {
+          "event_id": "u-hello",
+          "role": "user",
+          "occurred_at": "2026-10-22T09:00:00+08:00",
+          "text": "Good morning."
+        },
+        {
+          "event_id": "a-hello",
+          "role": "assistant",
+          "occurred_at": "2026-10-22T09:00:01+08:00",
+          "text": "Morning. What are you planning to do first today?"
+        }
+      ]
+    },
+    {
+      "dialogue_id": "d-music-2026",
+      "linked_memory_ids": [],
+      "facets": {
+        "types": [],
+        "occurred_time": null,
+        "places": [],
+        "people": [],
+        "objects": [],
+        "topics": []
+      },
+      "messages": [
+        {
+          "event_id": "u-music",
+          "role": "user",
+          "occurred_at": "2026-10-23T20:00:00+08:00",
+          "text": "The music today feels really calming."
+        },
+        {
+          "event_id": "a-music",
+          "role": "assistant",
+          "occurred_at": "2026-10-23T20:00:01+08:00",
+          "text": "Which song fits your mood best right now?"
+        }
+      ]
+    }
+  ]
+}

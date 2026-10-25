@@ -1,12 +1,12 @@
 # Logical Partitions and Progressive Recall of Distant Memories
 
-Build composable indexes over cold memories by **type, time, place, person, object, and topic**. Any sufficiently discriminating cue from the user can serve as the first entry point. Later turns can add constraints to locate the exact event. The user does not need to provide every field at once.
+Keep the complete user-and-assistant dialogue in a host-managed cold archive, then build composable indexes over its messages or episodes by **type, time, place, person, object, and topic**. Every conversation remains stored even when it has no useful facet or separate fact card. Any sufficiently discriminating cue from the user can serve as the first entry point. Later turns can add constraints to locate the exact event. The user does not need to provide every field at once.
 
 This is a specification to implement. Logical partitions can be database indexes and metadata filters; no physical disk partitions or immediate vector database adoption are required.
 
 ## 1. One body, multiple entry points
 
-Consider a fictional record: “In October 2019, the user bought a film camera while traveling in Xi'an.” Store its body once; all indexes point to the same `memory_id`.
+Consider a fictional exchange: “In October 2019, the user bought a film camera while traveling in Xi'an.” Store the original dialogue once, link a compact memory card to its message IDs, and let all facet indexes point to that same archived source or card. The archive keeps other conversational turns too, even those that never become cards.
 
 | Entry point | Example index | User cue it can answer |
 | --- | --- | --- |
@@ -19,7 +19,7 @@ Consider a fictional record: “In October 2019, the user bought a film camera w
 
 The dimensions have no fixed search order. “That time in Xi'an” starts with place; “my old camera” starts with object; “the 2019 trip” combines time and topic. The implementation can choose whichever available index narrows the scope most, without forcing every query through a type-then-time-then-place hierarchy.
 
-Do not duplicate an entire memory for each category, or send every tag, directory tree, and index entry to the conversational model. Indexes reside in host storage; the model receives only a few selected candidate cards or body excerpts.
+Do not duplicate an entire conversation for each category, or send every tag, directory tree, and index entry to the conversational model. Indexes reside in host storage; the model receives only a few selected candidate cards or source excerpts. An untagged turn is still stored; authorized full-text or time-bounded search can find it when facet extraction missed it, within the same global candidate and recall limits.
 
 ## 2. Field contract
 

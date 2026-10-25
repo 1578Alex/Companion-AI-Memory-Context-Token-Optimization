@@ -1,1 +1,1 @@
-陪伴 AI 聊久了，旧对话越背越多。我想让它把常聊的放手边，久远的先收好；你一提“西安那次”，它再找回来。给 Coopanion 省点上下文和 Token。/ A lighter memory plan for AI companions.
+看到大哈鱼（Coopanion）聊久了会被上下文卡住，还有那句“爸爸想给你完整的生命”，挺触动。于是想把所有对话留在冷记忆仓库，只在需要时找回来，少花点 Token。欢迎试用提示词、一起测试。/ A cue-based memory plan for AI companions.

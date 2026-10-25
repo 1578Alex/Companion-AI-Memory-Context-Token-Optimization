@@ -85,6 +85,10 @@
     "include_maintenance_in_cost_report": true
   },
   "storage": {
+    "archive_every_user_and_assistant_dialogue_turn": true,
+    "retain_raw_text_without_memory_card": true,
+    "memory_cards_are_derived_pointers_not_the_only_archive": true,
+    "explicit_user_delete_removes_raw_and_derived_copies": true,
     "cold_access": "host_mediated",
     "allow_generic_tool_bypass": false,
     "filter_owner_and_scope_before_retrieval": true,

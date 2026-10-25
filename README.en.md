@@ -2,19 +2,19 @@
 
 **中文：[陪伴 AI 记忆上下文 token优化](README.md)**
 
-An AI companion can end up carrying the same old conversations into every new chat. Replies get slower, and the token bill keeps growing. The idea here is simple: keep the things you talk about often close at hand, put older memories away, and find them again when you give a clue—“Remember that time in Xi'an?”
+I recently came across Da Ha Yu ([Coopanion](https://github.com/Pal-AI-Lab/Coopanion)), an AI companion project struggling with the limits of a long conversation. One comment stayed with me: “爸爸想给你完整的生命” — “Dad wants to give you a complete life.” It made me want an AI companion to keep the moments you've shared, without carrying every old chat into every new reply.
 
-I wrote this with [Coopanion](https://github.com/Pal-AI-Lab/Coopanion) in mind. The repo has the plan, prompts, and made-up examples. It's still a proposal, not a feature running in Coopanion. The memory ideas build on earlier work; see [References](REFERENCES.en.md).
+So I put together this plan: save the full conversation in a cold archive, keep the things you talk about often close at hand, and find older moments when you give a clue — “Remember that time in Xi'an?” That should use fewer tokens while holding on to the past. The prompts and made-up examples are here for anyone who wants to try them and help test the idea. It's still a proposal, not a feature running in Coopanion; the memory ideas build on earlier work in [References](REFERENCES.en.md).
 
 ## The memory model
 
-Persistent storage may grow, but each model request has a firm context budget. “Forgetting” means an old detail is absent from the current request, not that its source record was destroyed or that the assistant should pretend to be human.
+The design keeps every turn of the conversation, from both sides, in a host-managed cold archive unless the user asks to delete it. Each model request gets only a small recent window and a few relevant notes. “Forgetting” means an old chat is out of sight for now; the user can bring it back with a clue.
 
 | Area | Contents | When used |
 | --- | --- | --- |
 | Recent window | Recent exchanges and the current task's required state | Bounded continuity for the current topic |
 | Working memory | A few explicitly pinned facts and relevant, recent or repeated user topics | Selected by relevance and strict item/token limits |
-| Cold archive | Infrequent or older records, with their source and metadata | Searched only after a current user cue |
+| Cold archive | The full conversation and searchable notes about older moments | Searched only after a current user cue |
 | Temporary recall | A few cold records matched to the cue | Expires when the topic or authorization ends |
 
 Only verified, substantive user mentions increase a memory's frequency. An assistant's restatement, a tool read, a timer, and a retry do not. A single recall does not promote a cold record to working memory. Corrections, explicit pinning, “only mention this when I ask,” and deletion have distinct behavior.
@@ -53,7 +53,7 @@ To find the real number, we'd also count cached input, extra tool calls, model o
 2. Follow the [Coopanion integration design](docs/coopanion-integration.en.md) to implement host-controlled storage, user-cue permission, budget checks, and the actual outbound context view.
 3. Append the [English conversation policy](prompts/companion-policy.en.md) to the existing persona only after the host can supply a bounded memory snapshot. The [Chinese policy](prompts/companion-policy.zh.md) is an alternative, not an additional prompt to send every turn.
 4. Use the [incremental extractor](prompts/memory-extractor.en.md) for proposed updates. Use the [cue router](prompts/cue-router.en.md) only when simpler rules cannot resolve a cue.
-5. Check the [example policy](config/policy.example.json), [synthetic records](examples/memories.en.json), [30 acceptance scenarios](examples/scenarios.en.json), and [evaluation plan](docs/evaluation.en.md).
+5. Check the [example policy](config/policy.example.json), [complete conversation archive example](examples/dialogue-archive.en.json), [synthetic records](examples/memories.en.json), [31 acceptance scenarios](examples/scenarios.en.json), and [evaluation plan](docs/evaluation.en.md).
 
 A prompt alone cannot reduce input already sent to the model. The host must enforce the storage and retrieval boundary before each request, including old session history, handoff notes, and tool outputs.
 
@@ -68,7 +68,7 @@ A prompt alone cannot reduce input already sent to the model. The host must enfo
 | [Prompts](prompts/README.en.md) | Prompt roles and contracts |
 | [References](REFERENCES.en.md) | Prior research, official projects, and differences |
 
-The JSON examples are available in [English](examples/scenarios.en.json) and [Chinese](examples/scenarios.json). They are specifications, not results from a running model.
+The [conversation archive](examples/dialogue-archive.en.json) includes ordinary chat that never became a memory card. The JSON examples are available in [English](examples/scenarios.en.json) and [Chinese](examples/scenarios.json). They are specifications, not results from a running model.
 
 ## Implementation status
 
