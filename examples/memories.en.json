@@ -1,0 +1,363 @@
+{
+  "notice": "All records are fictional specification examples, not real user data or results of running a model.",
+  "as_of": "2026-10-25T09:00:00+08:00",
+  "records": [
+    {
+      "id": "m-style",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.response_style",
+      "topic_id": "communication",
+      "summary": "The user prefers concise replies in everyday conversation and more detail for complex questions.",
+      "source_refs": [
+        {
+          "event_id": "u-style",
+          "excerpt": "Please remember to keep everyday answers concise, and explain complex questions in more detail."
+        }
+      ],
+      "created_at": "2026-10-20T09:00:00+08:00",
+      "last_user_mention_at": "2026-10-20T09:00:00+08:00",
+      "mention_events": [
+        {
+          "interaction_id": "turn-style",
+          "occurred_at": "2026-10-20T09:00:00+08:00",
+          "kind": "substantive"
+        }
+      ],
+      "ongoing_until": null,
+      "pinned": true,
+      "recall_only": false,
+      "tier": "pinned",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "preference"
+        ],
+        "occurred_time": {
+          "start": null,
+          "end": null,
+          "precision": "unknown"
+        },
+        "places": [],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "communication"
+        ]
+      }
+    },
+    {
+      "id": "m-exam",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.project.language_exam.2026",
+      "topic_id": "language_exam",
+      "summary": "The user is preparing for a language exam and has recently practiced speaking; review whether the preparation is still ongoing by November 7.",
+      "source_refs": [
+        {
+          "event_id": "u-exam-3",
+          "excerpt": "I am still preparing for the speaking exam and will keep practicing over the next two weeks."
+        }
+      ],
+      "created_at": "2026-10-21T18:00:00+08:00",
+      "last_user_mention_at": "2026-10-24T18:00:00+08:00",
+      "mention_events": [
+        {
+          "interaction_id": "turn-exam-1",
+          "occurred_at": "2026-10-21T18:00:00+08:00",
+          "kind": "substantive"
+        },
+        {
+          "interaction_id": "turn-exam-2",
+          "occurred_at": "2026-10-23T18:00:00+08:00",
+          "kind": "substantive"
+        },
+        {
+          "interaction_id": "turn-exam-3",
+          "occurred_at": "2026-10-24T18:00:00+08:00",
+          "kind": "substantive"
+        }
+      ],
+      "ongoing_until": "2026-11-07T18:00:00+08:00",
+      "pinned": false,
+      "recall_only": false,
+      "tier": "hot",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "project"
+        ],
+        "occurred_time": {
+          "start": null,
+          "end": null,
+          "precision": "unknown"
+        },
+        "places": [],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "study",
+          "language_exam"
+        ]
+      }
+    },
+    {
+      "id": "m-cafe",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.event.hangzhou_cafe.2025-04-13",
+      "topic_id": "hangzhou_trip_2025",
+      "summary": "On a rainy day during an April 2025 trip to Hangzhou, the user said they found a quiet place to read at Riverbank Café.",
+      "source_refs": [
+        {
+          "event_id": "u-cafe",
+          "excerpt": "It is raining in Hangzhou today. I found a quiet place to read at Riverbank Café."
+        }
+      ],
+      "created_at": "2025-04-13T14:00:00+08:00",
+      "last_user_mention_at": "2025-04-13T14:00:00+08:00",
+      "mention_events": [],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "cold",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "experience"
+        ],
+        "occurred_time": {
+          "start": "2025-04-13",
+          "end": "2025-04-13",
+          "precision": "day"
+        },
+        "places": [
+          {
+            "id": "CN-Hangzhou",
+            "name": "Hangzhou",
+            "ancestors": [
+              "CN",
+              "CN-Zhejiang"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "travel",
+          "reading"
+        ]
+      }
+    },
+    {
+      "id": "m-city-old",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.current_city",
+      "topic_id": "residence",
+      "summary": "The user said in April 2025 that they lived in Hangzhou. A later statement about moving superseded this information.",
+      "source_refs": [
+        {
+          "event_id": "u-city-old",
+          "excerpt": "I currently live in Hangzhou."
+        }
+      ],
+      "created_at": "2025-04-01T09:00:00+08:00",
+      "last_user_mention_at": "2025-04-01T09:00:00+08:00",
+      "mention_events": [],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "cold",
+      "status": "superseded",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "fact"
+        ],
+        "occurred_time": {
+          "start": null,
+          "end": null,
+          "precision": "unknown"
+        },
+        "places": [
+          {
+            "id": "CN-Hangzhou",
+            "name": "Hangzhou",
+            "ancestors": [
+              "CN",
+              "CN-Zhejiang"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "residence"
+        ]
+      }
+    },
+    {
+      "id": "m-city-new",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.current_city",
+      "topic_id": "residence",
+      "summary": "On October 24, 2026, the user said they had moved to Suzhou and currently lived there.",
+      "source_refs": [
+        {
+          "event_id": "u-city-new",
+          "excerpt": "I have moved to Suzhou. I live in Suzhou now."
+        }
+      ],
+      "created_at": "2026-10-24T10:00:00+08:00",
+      "last_user_mention_at": "2026-10-24T10:00:00+08:00",
+      "mention_events": [
+        {
+          "interaction_id": "turn-city-new",
+          "occurred_at": "2026-10-24T10:00:00+08:00",
+          "kind": "substantive"
+        }
+      ],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "hot",
+      "status": "valid",
+      "supersedes": "m-city-old",
+      "facets": {
+        "types": [
+          "fact"
+        ],
+        "occurred_time": {
+          "start": null,
+          "end": null,
+          "precision": "unknown"
+        },
+        "places": [
+          {
+            "id": "CN-Suzhou",
+            "name": "Suzhou",
+            "ancestors": [
+              "CN",
+              "CN-Jiangsu"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "residence"
+        ]
+      }
+    },
+    {
+      "id": "m-xian-camera",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.event.m-xian-camera",
+      "topic_id": "xian_2019",
+      "summary": "The user bought a film camera while traveling in Xi’an in October 2019; the source record does not specify a brand or model.",
+      "source_refs": [
+        {
+          "event_id": "u-m-xian-camera",
+          "excerpt": "When I traveled to Xi’an in October 2019, I bought a film camera."
+        }
+      ],
+      "created_at": "2026-01-10T09:00:00+08:00",
+      "last_user_mention_at": "2026-01-10T09:00:00+08:00",
+      "mention_events": [],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "cold",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "experience",
+          "purchase"
+        ],
+        "occurred_time": {
+          "start": "2019-10-01",
+          "end": "2019-10-31",
+          "precision": "month"
+        },
+        "places": [
+          {
+            "id": "CN-Xian",
+            "name": "Xi’an",
+            "ancestors": [
+              "CN",
+              "CN-Shaanxi"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [
+          {
+            "id": "film_camera",
+            "name": "film camera",
+            "category": "camera"
+          }
+        ],
+        "topics": [
+          "travel",
+          "photography"
+        ]
+      }
+    },
+    {
+      "id": "m-xian-exhibition",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.event.m-xian-exhibition",
+      "topic_id": "xian_2021",
+      "summary": "The user attended a photography exhibition with a friend in Xi’an in May 2021; the source record does not give its name.",
+      "source_refs": [
+        {
+          "event_id": "u-m-xian-exhibition",
+          "excerpt": "I went to a photography exhibition with a friend in Xi’an in May 2021."
+        }
+      ],
+      "created_at": "2026-01-10T09:00:00+08:00",
+      "last_user_mention_at": "2026-01-10T09:00:00+08:00",
+      "mention_events": [],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "cold",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "experience"
+        ],
+        "occurred_time": {
+          "start": "2021-05-01",
+          "end": "2021-05-31",
+          "precision": "month"
+        },
+        "places": [
+          {
+            "id": "CN-Xian",
+            "name": "Xi’an",
+            "ancestors": [
+              "CN",
+              "CN-Shaanxi"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "photography",
+          "exhibition"
+        ]
+      }
+    }
+  ]
+}

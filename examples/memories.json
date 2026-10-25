@@ -1,0 +1,363 @@
+{
+  "notice": "全部为虚构的规格示例，不是真实用户数据或模型运行结果。",
+  "as_of": "2026-10-25T09:00:00+08:00",
+  "records": [
+    {
+      "id": "m-style",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.response_style",
+      "topic_id": "communication",
+      "summary": "用户希望日常回复简洁，复杂问题再展开。",
+      "source_refs": [
+        {
+          "event_id": "u-style",
+          "excerpt": "请记住，平时回答简洁一点，复杂的问题再讲细。"
+        }
+      ],
+      "created_at": "2026-10-20T09:00:00+08:00",
+      "last_user_mention_at": "2026-10-20T09:00:00+08:00",
+      "mention_events": [
+        {
+          "interaction_id": "turn-style",
+          "occurred_at": "2026-10-20T09:00:00+08:00",
+          "kind": "substantive"
+        }
+      ],
+      "ongoing_until": null,
+      "pinned": true,
+      "recall_only": false,
+      "tier": "pinned",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "preference"
+        ],
+        "occurred_time": {
+          "start": null,
+          "end": null,
+          "precision": "unknown"
+        },
+        "places": [],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "communication"
+        ]
+      }
+    },
+    {
+      "id": "m-exam",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.project.language_exam.2026",
+      "topic_id": "language_exam",
+      "summary": "用户正在准备语言考试，最近在练口语；是否继续需在11月7日前复核。",
+      "source_refs": [
+        {
+          "event_id": "u-exam-3",
+          "excerpt": "口语考试还在准备，这两周会继续练。"
+        }
+      ],
+      "created_at": "2026-10-21T18:00:00+08:00",
+      "last_user_mention_at": "2026-10-24T18:00:00+08:00",
+      "mention_events": [
+        {
+          "interaction_id": "turn-exam-1",
+          "occurred_at": "2026-10-21T18:00:00+08:00",
+          "kind": "substantive"
+        },
+        {
+          "interaction_id": "turn-exam-2",
+          "occurred_at": "2026-10-23T18:00:00+08:00",
+          "kind": "substantive"
+        },
+        {
+          "interaction_id": "turn-exam-3",
+          "occurred_at": "2026-10-24T18:00:00+08:00",
+          "kind": "substantive"
+        }
+      ],
+      "ongoing_until": "2026-11-07T18:00:00+08:00",
+      "pinned": false,
+      "recall_only": false,
+      "tier": "hot",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "project"
+        ],
+        "occurred_time": {
+          "start": null,
+          "end": null,
+          "precision": "unknown"
+        },
+        "places": [],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "study",
+          "language_exam"
+        ]
+      }
+    },
+    {
+      "id": "m-cafe",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.event.hangzhou_cafe.2025-04-13",
+      "topic_id": "hangzhou_trip_2025",
+      "summary": "2025年4月杭州旅行的雨天，用户说在河岸咖啡找了能安静看书的位置。",
+      "source_refs": [
+        {
+          "event_id": "u-cafe",
+          "excerpt": "杭州今天下雨，我在河岸咖啡找了个能安静看书的位置。"
+        }
+      ],
+      "created_at": "2025-04-13T14:00:00+08:00",
+      "last_user_mention_at": "2025-04-13T14:00:00+08:00",
+      "mention_events": [],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "cold",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "experience"
+        ],
+        "occurred_time": {
+          "start": "2025-04-13",
+          "end": "2025-04-13",
+          "precision": "day"
+        },
+        "places": [
+          {
+            "id": "CN-Hangzhou",
+            "name": "杭州",
+            "ancestors": [
+              "CN",
+              "CN-Zhejiang"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "travel",
+          "reading"
+        ]
+      }
+    },
+    {
+      "id": "m-city-old",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.current_city",
+      "topic_id": "residence",
+      "summary": "用户在2025年4月表示住在杭州，此信息已被后续搬家陈述更新。",
+      "source_refs": [
+        {
+          "event_id": "u-city-old",
+          "excerpt": "我现在住杭州。"
+        }
+      ],
+      "created_at": "2025-04-01T09:00:00+08:00",
+      "last_user_mention_at": "2025-04-01T09:00:00+08:00",
+      "mention_events": [],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "cold",
+      "status": "superseded",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "fact"
+        ],
+        "occurred_time": {
+          "start": null,
+          "end": null,
+          "precision": "unknown"
+        },
+        "places": [
+          {
+            "id": "CN-Hangzhou",
+            "name": "杭州",
+            "ancestors": [
+              "CN",
+              "CN-Zhejiang"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "residence"
+        ]
+      }
+    },
+    {
+      "id": "m-city-new",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.current_city",
+      "topic_id": "residence",
+      "summary": "用户2026年10月24日说已搬到苏州，目前居住在苏州。",
+      "source_refs": [
+        {
+          "event_id": "u-city-new",
+          "excerpt": "我已经搬到苏州了，现在住苏州。"
+        }
+      ],
+      "created_at": "2026-10-24T10:00:00+08:00",
+      "last_user_mention_at": "2026-10-24T10:00:00+08:00",
+      "mention_events": [
+        {
+          "interaction_id": "turn-city-new",
+          "occurred_at": "2026-10-24T10:00:00+08:00",
+          "kind": "substantive"
+        }
+      ],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "hot",
+      "status": "valid",
+      "supersedes": "m-city-old",
+      "facets": {
+        "types": [
+          "fact"
+        ],
+        "occurred_time": {
+          "start": null,
+          "end": null,
+          "precision": "unknown"
+        },
+        "places": [
+          {
+            "id": "CN-Suzhou",
+            "name": "苏州",
+            "ancestors": [
+              "CN",
+              "CN-Jiangsu"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "residence"
+        ]
+      }
+    },
+    {
+      "id": "m-xian-camera",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.event.m-xian-camera",
+      "topic_id": "xian_2019",
+      "summary": "2019年10月用户在西安旅行时买了一台胶片相机，原记录未写品牌和型号。",
+      "source_refs": [
+        {
+          "event_id": "u-m-xian-camera",
+          "excerpt": "2019年十月去西安旅行的时候，我买了一台胶片相机。"
+        }
+      ],
+      "created_at": "2026-01-10T09:00:00+08:00",
+      "last_user_mention_at": "2026-01-10T09:00:00+08:00",
+      "mention_events": [],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "cold",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "experience",
+          "purchase"
+        ],
+        "occurred_time": {
+          "start": "2019-10-01",
+          "end": "2019-10-31",
+          "precision": "month"
+        },
+        "places": [
+          {
+            "id": "CN-Xian",
+            "name": "西安",
+            "ancestors": [
+              "CN",
+              "CN-Shaanxi"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [
+          {
+            "id": "film_camera",
+            "name": "胶片相机",
+            "category": "camera"
+          }
+        ],
+        "topics": [
+          "travel",
+          "photography"
+        ]
+      }
+    },
+    {
+      "id": "m-xian-exhibition",
+      "owner_id": "demo-user",
+      "scope_id": "demo-companion",
+      "fact_key": "user.event.m-xian-exhibition",
+      "topic_id": "xian_2021",
+      "summary": "2021年5月用户在西安和朋友参加摄影展，原记录未写展览名称。",
+      "source_refs": [
+        {
+          "event_id": "u-m-xian-exhibition",
+          "excerpt": "2021年五月，我在西安和朋友看了一场摄影展。"
+        }
+      ],
+      "created_at": "2026-01-10T09:00:00+08:00",
+      "last_user_mention_at": "2026-01-10T09:00:00+08:00",
+      "mention_events": [],
+      "ongoing_until": null,
+      "pinned": false,
+      "recall_only": false,
+      "tier": "cold",
+      "status": "valid",
+      "supersedes": null,
+      "facets": {
+        "types": [
+          "experience"
+        ],
+        "occurred_time": {
+          "start": "2021-05-01",
+          "end": "2021-05-31",
+          "precision": "month"
+        },
+        "places": [
+          {
+            "id": "CN-Xian",
+            "name": "西安",
+            "ancestors": [
+              "CN",
+              "CN-Shaanxi"
+            ]
+          }
+        ],
+        "people": [],
+        "objects": [],
+        "topics": [
+          "photography",
+          "exhibition"
+        ]
+      }
+    }
+  ]
+}

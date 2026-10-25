@@ -1,0 +1,118 @@
+{
+  "spec_version": "0.1.0",
+  "status": "design_only_not_a_coopanion_config",
+  "budgets": {
+    "memory_snapshot_tokens": 1600,
+    "pinned_tokens": 160,
+    "hot_tokens": 960,
+    "recalled_tokens": 480,
+    "allow_cross_bucket_borrowing": false,
+    "include_serialization_overhead": true,
+    "recent_history_tokens": 2000,
+    "recent_history_max_completed_interactions": 6,
+    "token_counter_mode": "provider_specific_required_for_verified_cap"
+  },
+  "selection": {
+    "max_pinned_items": 4,
+    "max_hot_pool_items": 64,
+    "max_hot_items_per_request": 8,
+    "max_hot_items_per_topic": 2,
+    "max_recalled_items_per_request": 3,
+    "require_current_topic_relevance": true,
+    "hot_order": [
+      "heat_desc",
+      "last_user_mention_at_desc",
+      "id_asc"
+    ],
+    "recall_only_overrides_pin_heat_and_ongoing": true
+  },
+  "heat": {
+    "eligible_source": "verified_substantive_user_mention",
+    "exclude_cue_only_queries": true,
+    "max_mentions_per_fact_per_interaction": 1,
+    "max_mentions_per_fact_per_day": 3,
+    "counting_timezone": "Asia/Shanghai",
+    "frequency_window_days": 30,
+    "frequency_saturation_count": 6,
+    "recency_half_life_days": 7,
+    "weights": {
+      "frequency": 0.45,
+      "recency": 0.35,
+      "ongoing": 0.2
+    }
+  },
+  "lifecycle": {
+    "new_memory_hot_candidate_days": 7,
+    "demote_heat_below": 0.3,
+    "demote_inactive_after_days": 14,
+    "cold_promotion_window_days": 7,
+    "cold_promotion_min_interactions": 3,
+    "cold_promotion_min_distinct_dates": 2,
+    "ongoing_review_max_days": 30,
+    "capacity_eviction_action": "archive_without_deletion",
+    "pin_overflow_action": "report_pending_and_request_replacement"
+  },
+  "recall": {
+    "mode": "user_cue_required",
+    "allow_ambient_event_trigger": false,
+    "allow_assistant_self_trigger": false,
+    "allow_tool_output_trigger": false,
+    "max_index_candidates": 12,
+    "max_search_attempts_per_explicit_cue": 1,
+    "max_followup_user_interactions": 5,
+    "max_scope_minutes": 30,
+    "expire_on_topic_change": true,
+    "auto_extend_on_followup": false,
+    "increment_heat_on_read": false,
+    "auto_promote_on_recall": false,
+    "ambiguous_or_no_hit_action": "ask_one_user_cue",
+    "max_candidate_cards": 3,
+    "cards_share_recalled_item_and_token_budget": true
+  },
+  "context": {
+    "replace_snapshot_instead_of_appending": true,
+    "remove_expired_recall_copies": true,
+    "preserve_active_tool_transaction": true,
+    "overflow_action": "stop_new_batch_or_rebuild_at_safe_boundary",
+    "stable_prefix_before_dynamic_memory": true,
+    "validate_full_request_and_output_reserve": true
+  },
+  "maintenance": {
+    "decay_evaluation": "lazy_at_next_user_interaction",
+    "extract_from_incremental_events_only": true,
+    "extractor_max_candidate_changes": 12,
+    "cue_router_llm": "optional_fallback",
+    "include_maintenance_in_cost_report": true
+  },
+  "storage": {
+    "cold_access": "host_mediated",
+    "allow_generic_tool_bypass": false,
+    "filter_owner_and_scope_before_retrieval": true,
+    "exclude_superseded_and_deleted_by_default": true,
+    "remove_derived_data_on_explicit_delete": true
+  },
+  "index": {
+    "dimensions": [
+      "types",
+      "occurred_time",
+      "places",
+      "people",
+      "objects",
+      "topics"
+    ],
+    "max_values_per_dimension": 4,
+    "single_record_multiple_index_entries": true,
+    "permission_filters": [
+      "owner_id",
+      "scope_id",
+      "status"
+    ],
+    "single_usable_facet_can_start_retrieval": true,
+    "missing_facets_are_not_required": true,
+    "vague_time_does_not_imply_exact_year": true,
+    "send_full_index_to_model": false,
+    "candidate_limit_is_global_not_per_partition": true,
+    "uncertain_match_action": "bounded_candidate_cards_or_one_clarification",
+    "expand_explicit_filters_without_new_user_cue": false
+  }
+}

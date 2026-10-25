@@ -1,0 +1,107 @@
+{
+  "notice": "宿主逻辑示例，未执行查询；ID指向memories.json，预算仍需对应模型tokenizer验证。",
+  "owner_id": "demo-user",
+  "scope_id": "demo-companion",
+  "turns": [
+    {
+      "event_id": "u-recall-xian-1",
+      "text": "你还记得当年在西安那次吗？",
+      "cue_scope_id": "cue-xian-1",
+      "permission_filters": {
+        "owner_id": "demo-user",
+        "scope_id": "demo-companion",
+        "status": "valid"
+      },
+      "facet_filters": {
+        "places": [
+          "CN-Xian"
+        ],
+        "occurred_time": null,
+        "types": [],
+        "people": [],
+        "objects": [],
+        "topics": []
+      },
+      "unresolved_time_expression": "当年",
+      "max_candidates_global": 12,
+      "recall_status": "ambiguous",
+      "truncated": false,
+      "candidate_cards": [
+        {
+          "id": "m-xian-camera",
+          "title": "西安旅行中买胶片相机",
+          "occurred_time_label": "2019年10月",
+          "types": [
+            "experience",
+            "purchase"
+          ]
+        },
+        {
+          "id": "m-xian-exhibition",
+          "title": "西安与朋友看摄影展",
+          "occurred_time_label": "2021年5月",
+          "types": [
+            "experience"
+          ]
+        }
+      ],
+      "recalled_bodies": [],
+      "snapshot_recall_limits": {
+        "items": 3,
+        "tokens_including_cards_and_wrappers": 480
+      },
+      "assistant_example": "你说的是买相机那次，还是看摄影展那次？"
+    },
+    {
+      "event_id": "u-recall-xian-2",
+      "text": "买相机那次。",
+      "inherits_cue_scope_id": "cue-xian-1",
+      "permission_filters": {
+        "owner_id": "demo-user",
+        "scope_id": "demo-companion",
+        "status": "valid"
+      },
+      "facet_filters": {
+        "places": [
+          "CN-Xian"
+        ],
+        "occurred_time": null,
+        "types": [
+          "purchase"
+        ],
+        "people": [],
+        "objects": [
+          "camera"
+        ],
+        "topics": []
+      },
+      "object_match": "camera匹配其子类film_camera，依据已核验的类别映射",
+      "max_candidates_global": 12,
+      "recall_status": "matched",
+      "truncated": false,
+      "candidate_cards": [],
+      "recalled_bodies": [
+        {
+          "id": "m-xian-camera",
+          "summary": "2019年10月用户在西安旅行时买了一台胶片相机，原记录未写品牌和型号。",
+          "source_refs": [
+            "u-m-xian-camera"
+          ],
+          "occurred_time": {
+            "start": "2019-10-01",
+            "end": "2019-10-31",
+            "precision": "month"
+          },
+          "created_at": "2026-01-10T09:00:00+08:00"
+        }
+      ],
+      "snapshot_recall_limits": {
+        "items": 3,
+        "tokens_including_cards_and_wrappers": 480
+      },
+      "assistant_example": "找到了，是2019年10月那次西安旅行，你提过买了一台胶片相机。记录里没有写品牌和型号。",
+      "persistent_record_tier": "cold",
+      "heat_increment_from_retrieval": 0
+    }
+  ]
+}

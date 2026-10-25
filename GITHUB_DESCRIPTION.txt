@@ -1,0 +1,1 @@
+陪伴 AI 记忆上下文 token优化：借鉴冷热分层与线索唤回，减少长对话的重复上下文加载。中英双语，面向 Coopanion；节省比例待实测。 / Bilingual tiered-memory proposal; savings not yet measured.

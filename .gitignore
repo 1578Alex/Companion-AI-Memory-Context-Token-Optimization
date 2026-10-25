@@ -1,0 +1,15 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+runtime/
+private-data/
+local-reports/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+*.key
+*.pem

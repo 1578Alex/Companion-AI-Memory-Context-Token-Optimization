@@ -1,0 +1,107 @@
+{
+  "notice": "Example host-side logic; no query has been executed. IDs point to memories.en.json. The budget still requires verification with the target model tokenizer.",
+  "owner_id": "demo-user",
+  "scope_id": "demo-companion",
+  "turns": [
+    {
+      "event_id": "u-recall-xian-1",
+      "text": "Do you remember that time in Xi’an years ago?",
+      "cue_scope_id": "cue-xian-1",
+      "permission_filters": {
+        "owner_id": "demo-user",
+        "scope_id": "demo-companion",
+        "status": "valid"
+      },
+      "facet_filters": {
+        "places": [
+          "CN-Xian"
+        ],
+        "occurred_time": null,
+        "types": [],
+        "people": [],
+        "objects": [],
+        "topics": []
+      },
+      "unresolved_time_expression": "years ago",
+      "max_candidates_global": 12,
+      "recall_status": "ambiguous",
+      "truncated": false,
+      "candidate_cards": [
+        {
+          "id": "m-xian-camera",
+          "title": "Bought a film camera on a Xi’an trip",
+          "occurred_time_label": "October 2019",
+          "types": [
+            "experience",
+            "purchase"
+          ]
+        },
+        {
+          "id": "m-xian-exhibition",
+          "title": "Visited a photography exhibition with a friend in Xi’an",
+          "occurred_time_label": "May 2021",
+          "types": [
+            "experience"
+          ]
+        }
+      ],
+      "recalled_bodies": [],
+      "snapshot_recall_limits": {
+        "items": 3,
+        "tokens_including_cards_and_wrappers": 480
+      },
+      "assistant_example": "Do you mean the camera purchase or the photography exhibition?"
+    },
+    {
+      "event_id": "u-recall-xian-2",
+      "text": "The time when I bought the camera.",
+      "inherits_cue_scope_id": "cue-xian-1",
+      "permission_filters": {
+        "owner_id": "demo-user",
+        "scope_id": "demo-companion",
+        "status": "valid"
+      },
+      "facet_filters": {
+        "places": [
+          "CN-Xian"
+        ],
+        "occurred_time": null,
+        "types": [
+          "purchase"
+        ],
+        "people": [],
+        "objects": [
+          "camera"
+        ],
+        "topics": []
+      },
+      "object_match": "camera matches its film_camera subtype under a verified category mapping",
+      "max_candidates_global": 12,
+      "recall_status": "matched",
+      "truncated": false,
+      "candidate_cards": [],
+      "recalled_bodies": [
+        {
+          "id": "m-xian-camera",
+          "summary": "The user bought a film camera while traveling in Xi’an in October 2019; the source record does not specify a brand or model.",
+          "source_refs": [
+            "u-m-xian-camera"
+          ],
+          "occurred_time": {
+            "start": "2019-10-01",
+            "end": "2019-10-31",
+            "precision": "month"
+          },
+          "created_at": "2026-01-10T09:00:00+08:00"
+        }
+      ],
+      "snapshot_recall_limits": {
+        "items": 3,
+        "tokens_including_cards_and_wrappers": 480
+      },
+      "assistant_example": "I found the record: on that October 2019 trip to Xi’an, you mentioned buying a film camera. The record does not give its brand or model.",
+      "persistent_record_tier": "cold",
+      "heat_increment_from_retrieval": 0
+    }
+  ]
+}
