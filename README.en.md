@@ -2,13 +2,11 @@
 
 **中文：[陪伴 AI 记忆上下文 token优化](README.md)**
 
-I recently came across Da Ha Yu ([Coopanion](https://github.com/Pal-AI-Lab/Coopanion)) and the line “爸爸想给你完整的生命” — “Dad wants to give you a complete life.” It stayed with me. As conversations grow, old messages take up more context, some moments can become harder to find after a handoff, and input tokens keep piling up. I wanted a way for an AI companion to keep the whole conversation while using fewer tokens for each reply.
+I recently saw the “爸爸想给你完整的生命” (“Dad wants to give you a complete life”) story about Da Ha Yu, the AI companion ([Coopanion](https://github.com/Pal-AI-Lab/Coopanion)). As conversations grow, the context overflows, memories get lost, and huge amounts of tokens are used. So I designed a way for companion AIs to keep their complete memories while saving tokens.
 
 ## How it works
 
-Think of human memory alongside a computer's RAM and disk. People don't replay their whole lives every time they talk, and an AI needn't do that either. **Under this design, the original text of every conversation would go into a cold archive** (except anything the user explicitly asks to delete). A small set of recent or often-mentioned memories stays close at hand. Older moments are indexed by type, time, place, and other clues. When the user brings up a person, place, or event from the past, the AI can follow that clue to retrieve just the relevant pieces.
-
-“Forgetting” here means leaving an old conversation out of the current context for now, not erasing its original text. The goal is to send fewer tokens with each request; the real saving still needs to be tested after integration.
+This follows the logic of human memory and traditional storage optimization. People don't replay their whole lives every time they talk, and an AI needn't do that either. Memories are divided into hot memories that come up often or recently, and colder memories. Day-to-day context reads only the hot memories; older things go onto the cold-memory “hard drive” and are indexed by category. When someone brings up a person, place, or event from the past that isn't in hot memory, the AI searches for it using the user's keywords. This can save a great deal of context and tokens.
 
 ## Three ground rules
 
@@ -20,13 +18,13 @@ Think of human memory alongside a computer's RAM and disk. People don't replay t
 
 The cold archive keeps the full text of every conversation, including everyday chat that never becomes a separate memory card. It then builds logical indexes by **type, time, place, person, object, and topic**. The original conversation is stored once; each category is another way to find it.
 
-Suppose the user suddenly asks, “Do you remember the bowl of ganmianpi (a Shaanxi noodle dish) we had in Xi'an years ago?” The host first searches for “Xi'an” and “ganmianpi.” A future interface could make that brief search feel like taking a moment to remember something from long ago; no such delay is implemented here. If two relevant conversations really exist, the AI can offer a couple of brief choices: “The time near the Giant Wild Goose Pagoda, or the one in the old town?” The user's next clue narrows the search to the original exchange. The AI must not make up a restaurant or an event.
+For example, the user might suddenly ask, “Do you remember that bowl of ganmianpi (a Shaanxi noodle dish) we ate in Xi'an years ago?” The AI searches the relevant memories using “Xi'an” and “ganmianpi.” The wait while it searches can even feel like a person trying to recall the distant past. If several memories turn up, it offers a few short candidates and asks, “The time by the Giant Wild Goose Pagoda, or the time in the old town?” The user adds, “The Giant Wild Goose Pagoda one,” and the AI combines place, object, and event type to find the original conversation.
 
-The full directory and every Xi'an memory stay out of the prompt. Candidate cards and final excerpts share one recall allowance: at most 3 items and 480 tokens. See the [cold archive indexing design](docs/cold-storage-index.en.md); a separate [structured search example](examples/recall-plan.en.json) follows a camera purchase in Xi'an.
+The full directory and every Xi'an memory stay out of the prompt. Candidate cards and final summaries share one recall allowance: at most 3 items and 480 tokens. See the [cold archive indexing design](docs/cold-storage-index.en.md) and the [structured search example](examples/recall-plan.en.json).
 
 ## Initial budget suggestions
 
-These are starting values to try, not Coopanion's current settings or proven best limits. I haven't run a live test yet. Feedback is welcome, and I'll keep improving the plan. If you find it useful, you can also follow me on Bilibili or other platforms as “原无奇变.”
+These are starting values to test, not Coopanion's current settings or proven best limits. I don't currently have time to run the tests; feedback is welcome, and I'll keep improving the plan. If you find it useful, please follow me on Bilibili or any other platform: 原无奇变.
 
 | Component | Limit |
 | --- | ---: |
@@ -100,6 +98,6 @@ The main design, integration, evaluation, references, and prompts have matching 
 
 ## Related work and project status
 
-[MemGPT](https://arxiv.org/abs/2310.08560) has bounded context and a searchable conversation history; [MemoryBank](https://github.com/zhongwanjun/MemoryBank-SiliconFriend) studies time-based decay and reinforcement for companion memory; [MemoryOS](https://github.com/BAI-LAB/MemoryOS) uses tiers and heat; and [Zep](https://help.getzep.com/episodes) retains ingested source text and derives searchable facts. See [References](REFERENCES.en.md) for what this plan borrows and how it differs.
+[MemGPT](https://arxiv.org/abs/2310.08560) offers the idea of a main context and tiered external storage; [MemoryBank](https://github.com/zhongwanjun/MemoryBank-SiliconFriend) studies time-based forgetting and reinforcement for companion memory; and [MemoryOS](https://github.com/BAI-LAB/MemoryOS) offers OS-style memory tiers and heat management. See [References](REFERENCES.en.md) for what this plan draws on and how it differs.
 
 This is an independent proposal for Coopanion, not an official Pal-AI-Lab plan or endorsement. The source review is pinned to revisions checked on 2026-10-25; later revisions need another integration review. This package contains original documentation, prompts, and fictional data, not copied upstream source. Each upstream project retains its own license. The publisher can add a LICENSE after choosing distribution terms; this package does not choose a license on the publisher's behalf.
