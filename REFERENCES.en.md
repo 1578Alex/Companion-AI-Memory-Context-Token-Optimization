@@ -38,11 +38,19 @@ Version 0.1 of this project is an independent design and prompt package for Coop
 
 **Limits of the efficiency evidence:** Table 3 compares retrieved tokens, model calls, and answer quality on LoCoMo. Different baselines involve tradeoffs across those measures. The table is not an end-to-end Coopanion API billing experiment, nor does it isolate the gains from user-cue gating or our frequency rule. This project has no verified savings percentage.
 
-## 4. What This Project Combines
+## 4. Zep: Source Episodes, Derived Facts, and Selected Context
+
+- Official documentation: [Agent memory](https://help.getzep.com/v4/agent-memory-solution), [Episodes](https://help.getzep.com/episodes), [How Graph Creation Works](https://help.getzep.com/how-graph-creation-works), and [Context types](https://help.getzep.com/context-types). We checked the accessible v4 documentation on 2026-10-25; these observations do not cover every earlier version or deployment.
+
+**Direct overlap:** Each message an application sends to Zep becomes a source `episode`. Zep retains ingested episodes and derives entities, time-scoped facts, and summaries from them. Relevant source text and derived context can be searched or selected into a Context Block. This already covers much of the basic idea of keeping originals outside the prompt, finding sources through indexed facts, and supplying only relevant context. Zep can retain only what an application actually ingests; its documentation does not prove that every integration archives every conversation turn.
+
+**Our additional rules:** The host must archive every user and assistant dialogue turn. Only a discriminating cue from the current authenticated user, or a valid continuation of that topic, can open old-memory retrieval. Only deduplicated substantive user mentions raise heat, and fixed limits apply to the actual outbound request. Zep's documented standard flow retrieves a relevant Context Block before the next model request, with default relevance based on recent messages. That is not the same as a mandatory user-cue gate, although an application could add one. This proposal has not shown lower cost or better recall than an integration built on Zep or another existing system.
+
+## 5. What This Project Combines
 
 | Policy | Our rule | Relationship to prior work |
 | --- | --- | --- |
-| Nondestructive cold storage | Demote and archive by default; low frequency alone does not delete source records | External storage has precedents; this differs from inspected implementations that delete records |
+| Nondestructive cold storage | Demote and archive by default; low frequency alone does not delete source records | MemGPT's recall storage and Zep's source episodes are precedents; this differs from inspected implementations that delete records |
 | User-cue gate | Only the current authenticated user can authorize cold recall; background tasks and model initiative cannot expand the scope | A narrower product policy than general autonomous or every-query retrieval |
 | Faceted, progressive lookup | Start with any supported type, event time, place, person, object, or topic; show short candidate cards before reading necessary bodies | Uses established metadata filtering and faceted search; logical partitioning is not claimed as a new algorithm |
 | User-mention frequency | Count only deduplicated user mentions; model recall, summaries, and repetition do not count | Avoids self-reinforcing heat; the effect still requires evaluation |
@@ -51,7 +59,7 @@ Version 0.1 of this project is an independent design and prompt package for Coop
 
 This combination is a proposed engineering design. The identified precedents are enough to rule out a claim that nobody has tried related ideas. This document is not an exhaustive patent search or academic novelty review.
 
-## 5. Coopanion-Specific Boundaries
+## 6. Coopanion-Specific Boundaries
 
 The source review targeted these fixed revisions, not a completed runtime integration:
 

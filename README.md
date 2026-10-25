@@ -111,6 +111,6 @@
 
 ## 参考与项目关系
 
-[MemGPT](https://arxiv.org/abs/2310.08560)提供主上下文与外部存储的分层思路；[MemoryBank](https://github.com/zhongwanjun/MemoryBank-SiliconFriend)研究基于时间与强化的遗忘及陪伴记忆；[MemoryOS](https://github.com/BAI-LAB/MemoryOS)提供操作系统式记忆层级与热度管理。具体借鉴和实现差别见[参考说明](REFERENCES.md)。
+[MemGPT](https://arxiv.org/abs/2310.08560)已有有限上下文与完整可检索历史；[MemoryBank](https://github.com/zhongwanjun/MemoryBank-SiliconFriend)研究基于时间与强化的陪伴记忆；[MemoryOS](https://github.com/BAI-LAB/MemoryOS)提供分层与热度管理；[Zep](https://help.getzep.com/episodes)保存摄入的原文并从中提取可检索的事实。具体借鉴和实现差别见[参考说明](REFERENCES.md)。
 
 本项目是面向 Coopanion 的独立方案，不代表 Pal-AI-Lab 官方计划或背书。源码分析锁定于 2026-10-25 核验的版本，后续版本需要重新确认接入点。仓库仅含自编说明、提示词与虚构数据，未复制上游源码；上游项目继续适用其各自许可。发布者可在确定分发许可后补充 LICENSE；本包没有替发布者选择开源授权条款。

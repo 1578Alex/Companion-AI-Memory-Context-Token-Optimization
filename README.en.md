@@ -4,7 +4,7 @@
 
 I recently came across Da Ha Yu ([Coopanion](https://github.com/Pal-AI-Lab/Coopanion)), an AI companion project struggling with the limits of a long conversation. One comment stayed with me: “爸爸想给你完整的生命” — “Dad wants to give you a complete life.” It made me want an AI companion to keep the moments you've shared, without carrying every old chat into every new reply.
 
-So I put together this plan: save the full conversation in a cold archive, keep the things you talk about often close at hand, and find older moments when you give a clue — “Remember that time in Xi'an?” That should use fewer tokens while holding on to the past. The prompts and made-up examples are here for anyone who wants to try them and help test the idea. It's still a proposal, not a feature running in Coopanion; the memory ideas build on earlier work in [References](REFERENCES.en.md).
+So I put together this plan: save the full conversation in a cold archive, keep the things you talk about often close at hand, and find older moments when you give a clue — “Remember that time in Xi'an?” That should use fewer tokens while holding on to the past. The prompts and made-up examples are here for anyone who wants to try them and help test the idea. It's still a proposal, not a feature running in Coopanion; the memory ideas build on earlier work, including MemGPT, MemoryBank, MemoryOS, and Zep, compared in [References](REFERENCES.en.md).
 
 ## The memory model
 
