@@ -53,7 +53,7 @@ To find the real number, we'd also count cached input, extra tool calls, model o
 2. Follow the [Coopanion integration design](docs/coopanion-integration.en.md) to implement host-controlled storage, user-cue permission, budget checks, and the actual outbound context view.
 3. Append the [English conversation policy](prompts/companion-policy.en.md) to the existing persona only after the host can supply a bounded memory snapshot. The [Chinese policy](prompts/companion-policy.zh.md) is an alternative, not an additional prompt to send every turn.
 4. Use the [incremental extractor](prompts/memory-extractor.en.md) for proposed updates. Use the [cue router](prompts/cue-router.en.md) only when simpler rules cannot resolve a cue.
-5. Check the [example policy](config/policy.example.json), [complete conversation archive example](examples/dialogue-archive.en.json), [synthetic records](examples/memories.en.json), [31 acceptance scenarios](examples/scenarios.en.json), and [evaluation plan](docs/evaluation.en.md).
+5. Check the [example policy](config/policy.example.json), [three-conversation archive sample](examples/dialogue-archive.en.json), [synthetic records](examples/memories.en.json), [31 acceptance scenarios](examples/scenarios.en.json), and [evaluation plan](docs/evaluation.en.md).
 
 A prompt alone cannot reduce input already sent to the model. The host must enforce the storage and retrieval boundary before each request, including old session history, handoff notes, and tool outputs.
 
@@ -68,7 +68,7 @@ A prompt alone cannot reduce input already sent to the model. The host must enfo
 | [Prompts](prompts/README.en.md) | Prompt roles and contracts |
 | [References](REFERENCES.en.md) | Prior research, official projects, and differences |
 
-The [conversation archive](examples/dialogue-archive.en.json) includes ordinary chat that never became a memory card. The JSON examples are available in [English](examples/scenarios.en.json) and [Chinese](examples/scenarios.json). They are specifications, not results from a running model.
+The [conversation archive sample](examples/dialogue-archive.en.json) shows three complete synthetic exchanges, including ordinary chat that never became a memory card. It is not the source archive for all seven example cards. The JSON examples are available in [English](examples/scenarios.en.json) and [Chinese](examples/scenarios.json). They are specifications, not results from a running model.
 
 ## Implementation status
 

@@ -1,5 +1,5 @@
 {
-  "notice": "A synthetic complete-dialogue archive example, not real user data or a Coopanion runtime result. Cold storage retains the original text of every user and assistant turn; memory cards are derived indexing and bounded-recall material.",
+  "notice": "A sample with the full text of three synthetic exchanges, not real user data, a Coopanion runtime result, or the full source archive for all example memory cards. The proposed cold storage retains the original text of every user and assistant turn; memory cards are derived indexing and bounded-recall material.",
   "owner_id": "demo-user",
   "scope_id": "demo-companion",
   "archive_rule": "retain_all_user_and_assistant_dialogue_messages_except_explicit_deletion",

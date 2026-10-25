@@ -1,5 +1,5 @@
 {
-  "notice": "虚构的完整对话归档示例，不是真实用户数据或已经运行的 Coopanion 结果。冷仓库保留每轮用户与助手原文；记忆卡仅为索引和有限调用的派生资料。",
+  "notice": "三段虚构对话的完整原文样本，不是真实用户数据或已经运行的 Coopanion 结果，也不是全部示例记忆卡的来源全集。冷仓库设计要求保留每轮用户与助手原文；记忆卡仅为索引和有限调用的派生资料。",
   "owner_id": "demo-user",
   "scope_id": "demo-companion",
   "archive_rule": "retain_all_user_and_assistant_dialogue_messages_except_explicit_deletion",

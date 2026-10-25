@@ -63,7 +63,7 @@
 2. 按[Coopanion 接入说明](docs/coopanion-integration.md)实现宿主侧存储、选取、冷检索权限与实际请求投影。需要改变 Cortico 的请求构造行为时，在其支持的扩展点或上游实现。
 3. 将[对话记忆策略](prompts/companion-policy.zh.md)作为现有角色提示词的补充；上游接入可参考[英文版](prompts/companion-policy.en.md)。不要用它替换完整人格或工具协议。
 4. 用[记忆提取提示词](prompts/memory-extractor.zh.md)生成候选变更，由程序核验来源后写入；[线索判定提示词](prompts/cue-router.zh.md)仅在规则无法判断时选用。
-5. 以[示例配置](config/policy.example.json)、[完整对话归档示例](examples/dialogue-archive.json)、[合成案例](examples/scenarios.json)和[评估计划](docs/evaluation.md)验证效果。
+5. 以[示例配置](config/policy.example.json)、[三段对话归档样本](examples/dialogue-archive.json)、[合成案例](examples/scenarios.json)和[评估计划](docs/evaluation.md)验证效果。
 
 **单独粘贴提示词无法保证节省 token。** 当完整历史已经发给模型后，再要求它“只记重要的”并不会减少输入。真正的限制必须在请求发出前执行。
 
@@ -93,7 +93,7 @@
 | [prompts/README.md](prompts/README.md) | 提示词的使用边界和输入输出约定 |
 | [config/policy.example.json](config/policy.example.json) | 供未来实现读取的策略示例 |
 | [examples/memories.json](examples/memories.json) | 虚构记忆记录与字段示例 |
-| [examples/dialogue-archive.json](examples/dialogue-archive.json) | 虚构完整对话归档，包括没有生成记忆卡的闲聊 |
+| [examples/dialogue-archive.json](examples/dialogue-archive.json) | 三段虚构对话归档样本，包括没有生成记忆卡的闲聊；并非全部记忆卡的来源全集 |
 | [examples/scenarios.json](examples/scenarios.json) | 可转为自动化测试的验收场景 |
 | [examples/recall-plan.json](examples/recall-plan.json) | “西安那次”到“买相机那次”的筛选过程 |
 | [REFERENCES.md](REFERENCES.md) | 参考项目、论文与差异说明 |
