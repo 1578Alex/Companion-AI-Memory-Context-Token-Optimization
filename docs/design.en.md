@@ -1,6 +1,8 @@
-# Tiered Memory Design v0.1
+# Tiered Memory Design v0.2
 
 This design limits what the model sees **in each request** while preserving recoverable older records. It specifies behavior to implement; its example settings have not been tested with real users and are not a model of human memory.
+
+The optional [v0.2 continuity extension](persona-continuity.en.md) addresses cross-day personality, recent state, and details. The base rules still govern episodes and user facts. When enabled, divide the existing 960 hot tokens into 320 for continuity state, 320 for recent details, and 320 for topical facts. Current style state may guide tone across topics; specific events still require relevance and the existing cold-access gate. The total memory allowance does not grow.
 
 ## 1. Separate storage from visibility
 
@@ -63,8 +65,8 @@ This is a tunable engineering starting point, not a psychological law. Heat can 
 ### State transitions
 
 1. A new, source-backed fact card can be a hot candidate for up to seven days. Being a candidate does not mean being inserted into every request. Transient small talk stays in the original dialogue archive but need not create a separate fact card.
-2. After that candidate period, move a hot record to cold if `heat < 0.30`. Also move it to cold if it has had no qualifying mention for more than 14 days and is not a valid ongoing item. Recompute when the host prepares a request.
-3. Keep at most 64 records in the hot pool. If capacity is exceeded, retain candidates using heat and time of latest qualifying mention; archive the rest without deleting them. Select at most eight hot records for any request.
+2. First select an ordinary event's representation by continuous time since its latest qualifying user mention: prefer details during the first 72 hours, then use a verified short summary. Valid ongoing items first follow their bounded compact-state and review rules. For other ordinary records, normal cold eligibility begins after the seven-day candidate period with `heat < 0.30`, or after more than 14 days without a qualifying mention, with at least 24 hours of summary eligibility. Evaluate lazily, without midnight resets. Details and summaries are representations of one record; its original text remains archived. See [graduated cooling](graduated-cooling.en.md).
+3. Keep at most 64 hot-pool records and select at most eight per request. Under capacity pressure, first use an existing valid short summary for lower-priority candidates, then exclude nonessential whole records by priority. Preserve necessary compact state for the current thread and unfinished matters within the hard budget. If it cannot fit, record the capacity reason rather than hiding missing detail behind a vague summary or invention. Permission restrictions, corrections, and deletion apply immediately; current personality state follows its type exception.
 4. Promote cold back to hot only after at least three substantive mentions in independent interactions across at least two distinct dates within seven days, or when the user explicitly resumes the item as ongoing. A single cued recall leaves it cold.
 5. A user may explicitly pin or unpin a record. Pinned content allows at most four records and 160 tokens in total. If it overflows, tell the user what remains unpinned and ask them to combine or replace records; never silently evict an existing pin or claim that everything was saved.
 6. An ongoing item needs `ongoing_until`, with a default review period of at most 30 days. It stops earning the ongoing bonus when the period ends, but expiry alone does not prove the task was completed. Ask for its status when needed. Actual reminders and scheduled tasks belong to the task system, not to passive memory ranking.
@@ -105,7 +107,7 @@ Do not immediately copy a temporary recall into `PARTNER.md`, a handoff summary,
 
 The [example policy](../config/policy.example.json) limits each serialized memory block, including tags, IDs, time, provenance, and formatting, to 1,600 tokens: pinned 160, hot 960, recalled 480. Unused capacity cannot be borrowed across buckets. Leave empty slots empty. Recent history has a separate 2,000-token limit and at most six complete interactions, whichever limit is reached first.
 
-Filter invalid and irrelevant hot candidates, then sort stably by descending heat, descending latest qualifying mention, and ascending ID. Select at most two per topic so one frequent theme cannot consume the whole budget. On overflow, drop lower-ranked complete records first. A prevalidated shorter summary is allowed if necessary, but must retain negation, time, and factual qualifiers. Pinned overflow requires user-visible pin management.
+Filter invalid and irrelevant hot candidates, then select by active-task continuity, protected recent anchors, and ordinary heat priorities. Within a priority class, sort by descending heat, descending latest qualifying mention, and ascending ID. Select at most two per topic so one frequent theme cannot consume the whole budget. On overflow, first use prevalidated short summaries for lower-priority items, then exclude nonessential whole records that still do not fit. Retain negation, time, and factual qualifiers. Protected state has no unlimited allowance, and pinned overflow still requires user-visible pin management. See [graduated cooling](graduated-cooling.en.md) for representation selection, capacity exclusion, and normal cooling.
 
 Illustrative request assembly, **not** an existing Coopanion API:
 

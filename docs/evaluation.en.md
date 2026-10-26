@@ -90,3 +90,17 @@ Set acceptable quality thresholds before comparing cost. Hard constraints includ
 | P95 completion latency | Not measured | Not measured | Not measured |
 
 Every report must include versions, data sources, replay method, cache conditions, and missing data. This policy may reduce the memory inserted into requests, but total tokens and cost also depend on tools, reasoning, number of rounds, and caching. The experiment determines the real result.
+
+## 6. Additional continuity comparison
+
+When using the [continuity extension](persona-continuity.en.md), compare base C with C2 using this profile, keeping the same 1,600-token memory allowance, model, character version, tools, and sampling settings. Record hot subbudgets, the smaller topical-fact allowance, and maintenance costs too.
+
+Replay [P01–P14](../examples/continuity-scenarios.en.json) for cross-day restoration, restarts, gradual change, recent details, corrections, deletion, and concurrency. Numeric state transitions can be tested deterministically; use separate blind evaluation for the model's character continuity and detail accuracy. A controller calculation is not a measured model result.
+
+Record whether the first reply restores the current version, preserves recent wording and unfinished matters, changes tone abruptly, respects immediate boundaries, or changes personality after one cold recall. Measure actual tokens and costs. The goal is natural continuity with change, not identical tone in every situation. The sample parameters and intended behavior have not been validated with real-model experiments.
+
+## 7. Additional graduated-cooling acceptance
+
+Use [cooling cases C01–C06](../examples/cooling-scenarios.en.json) to check detail, summary, and cold-stage order; necessary continuity for unfinished matters; summary accuracy; capacity compression and exclusion reasons; lazy evaluation after long absence; and priority for corrections, deletion, and recall-only restrictions. Keep the existing S08 expectation of cold storage after 15 days. A gradual transition must not weaken the cold-access gate.
+
+Beyond deterministic state-machine checks, blind evaluation with real model replies must assess abrupt loss of recent details, whether summaries support natural continuation, and whether the next day feels like the same companion. Consistent documents and parameters do not establish improved experience.

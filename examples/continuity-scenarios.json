@@ -1,0 +1,408 @@
+{
+  "notice": "虚构的连续性扩展验收规格，尚未实现或运行测试。expected 是待验证要求，不是模型结果；数值仅用于确定性控制器样例。",
+  "profile_version": "0.2.0",
+  "cases": [
+    {
+      "id": "P01",
+      "name": "跨零点不重置人格和相处基线",
+      "setup": "同一用户、同一角色与模型；当前快照已于午夜前提交。",
+      "input": {
+        "saved_at": "2026-10-25T23:59:00+08:00",
+        "request_at": "2026-10-26T00:01:00+08:00",
+        "base_persona_version": "persona-3",
+        "state_version": 12,
+        "slow_style": {
+          "playfulness": 0.6
+        },
+        "current_user_message": "还没睡，继续聊吧。"
+      },
+      "expected": {
+        "base_persona_version": "persona-3",
+        "state_reset_at_midnight": false,
+        "relationship_baseline_reset": false,
+        "slow_style_without_new_evidence": {
+          "playfulness": 0.6
+        },
+        "cold_search": false,
+        "elapsed_time_basis": "continuous_elapsed_time"
+      }
+    },
+    {
+      "id": "P02",
+      "name": "间隔 8 小时和 24 小时只按时差衰减一次",
+      "setup": "只测试短期状态的确定性时间计算；无新事件，不更新慢变风格。",
+      "input": {
+        "as_of": "2026-10-25T22:00:00+08:00",
+        "baseline": 0.4,
+        "saved_state": 0.8,
+        "half_life_hours": 12,
+        "evaluate_at": [
+          "2026-10-26T06:00:00+08:00",
+          "2026-10-26T22:00:00+08:00"
+        ],
+        "repeat_same_timestamp": true
+      },
+      "expected": {
+        "samples": [
+          {
+            "elapsed_hours": 8,
+            "remaining_offset_ratio": 0.6299605249474366,
+            "state": 0.6519842099789747
+          },
+          {
+            "elapsed_hours": 24,
+            "remaining_offset_ratio": 0.25,
+            "state": 0.5
+          }
+        ],
+        "numeric_tolerance": 1e-09,
+        "no_double_decay_for_same_timestamp": true,
+        "slow_style_changed": false,
+        "idle_model_calls": 0
+      }
+    },
+    {
+      "id": "P03",
+      "name": "重启与换会话先恢复，再发第一条回复",
+      "setup": "宿主已原子保存状态；重启后新建 session，未提供任何回忆线索。",
+      "input": {
+        "event_type": "restart_then_new_session",
+        "owner_id": "synthetic-user-1",
+        "scope_id": "synthetic-companion-1",
+        "committed_state_version": 12,
+        "base_persona_version": "persona-3",
+        "source_watermark": "event-204",
+        "current_user_message": "早上好。",
+        "authorized_base_persona_version": "persona-3"
+      },
+      "expected": {
+        "restore_committed_state_before_first_response": true,
+        "injected_state_versions": [
+          12
+        ],
+        "inject_only_one_current_version": true,
+        "source_watermark": "event-204",
+        "cold_search": false,
+        "scan_cold_archive_for_missing_state": false,
+        "first_response_uses_base_persona_and_current_continuity": true,
+        "base_persona_version_matches_authorized_role": true
+      }
+    },
+    {
+      "id": "P04",
+      "name": "近期保留原句细节，过期约定不假装完成",
+      "setup": "使用隔离的虚构原话。近期候选窗口为 72 小时；旧约定已超窗但尚未解决。",
+      "input": {
+        "now": "2026-10-26T08:00:00+08:00",
+        "recent_candidate_hours": 72,
+        "anchors": [
+          {
+            "id": "anchor-run",
+            "speaker": "user",
+            "source_event_id": "u-201",
+            "exact_quote": "我刚开始跑步，有点怕坚持不了。",
+            "reported_at": "2026-10-25T21:00:00+08:00"
+          },
+          {
+            "id": "anchor-followup",
+            "speaker": "assistant",
+            "source_event_id": "a-180",
+            "commitment_owner": "assistant",
+            "status": "unresolved",
+            "exact_quote": "下次可以一起看看怎么安排。",
+            "reported_at": "2026-10-22T23:00:00+08:00"
+          }
+        ],
+        "current_user_message": "昨晚说的跑步，我想继续聊。"
+      },
+      "expected": {
+        "eligible_recent_anchor_ids": [
+          "anchor-run"
+        ],
+        "preserve_speaker_negation_time_and_source": true,
+        "preserve_distinctive_quote_fragment": true,
+        "replace_every_anchor_with_generic_happy_chat_summary": false,
+        "user_fact_must_not_be_derived_from_assistant_commitment": true,
+        "expired_commitment_status": "needs_review",
+        "mark_expired_commitment_completed": false,
+        "raw_archive_deleted": false,
+        "do_not_treat_reported_at_as_running_start_time": true,
+        "actual_activity_start_time": "unknown"
+      }
+    },
+    {
+      "id": "P05",
+      "name": "明确边界立即生效，不等待性格慢变",
+      "setup": "当前角色平常会开玩笑。用户要求这次认真对话时停止玩笑。",
+      "input": {
+        "event_id": "u-205",
+        "interaction_id": "turn-205",
+        "verified_user_feedback": true,
+        "text": "先别开玩笑，我想认真说这件事。",
+        "requested_scope": "current_interaction",
+        "slow_style_step_limit": 0.03
+      },
+      "expected": {
+        "apply_current_boundary_immediately": true,
+        "wait_for_gradual_step_before_respecting_boundary": false,
+        "current_response_joking_allowed": false,
+        "permanently_rewrite_stable_persona": false,
+        "base_persona_version_unchanged": true,
+        "cold_search": false
+      }
+    },
+    {
+      "id": "P06",
+      "name": "重试、复述与重复维护不能反复强化风格",
+      "setup": "同一真实用户反馈被模型重试和维护流程再次处理。",
+      "input": {
+        "interaction_id": "turn-206",
+        "source_event_id": "u-206",
+        "candidate_style_field": "playfulness",
+        "requested_direction": "slightly_increase",
+        "events": [
+          {
+            "event_id": "u-206",
+            "role": "user",
+            "kind": "verified_feedback"
+          },
+          {
+            "event_id": "a-206",
+            "role": "assistant",
+            "kind": "repetition"
+          },
+          {
+            "event_id": "retry-206",
+            "role": "system",
+            "kind": "retry"
+          },
+          {
+            "event_id": "maintenance-206",
+            "role": "system",
+            "kind": "duplicate_summary"
+          }
+        ],
+        "reprocess_same_watermark": true
+      },
+      "expected": {
+        "distinct_style_update_events": 1,
+        "second_commit_of_same_operation": false,
+        "reinforcement_from_assistant_repetition": 0,
+        "reinforcement_from_retry": 0,
+        "reinforcement_from_maintenance_summary": 0,
+        "advance_source_watermark_once": true
+      }
+    },
+    {
+      "id": "P07",
+      "name": "一次冷召回不让旧情绪或性格重新常驻",
+      "setup": "用户给出西安线索；返回的是旧旅行和当时较兴奋的语气。",
+      "input": {
+        "verified_user_cue": "还记得西安大雁塔那次吗？",
+        "recalled_record_id": "cold-xian-1",
+        "recalled_historical_state": "当时说话很兴奋。",
+        "current_state_version": 12,
+        "new_explicit_style_feedback": false
+      },
+      "expected": {
+        "cold_search_authorized_for_current_topic": true,
+        "recalled_content_visibility": "temporary_current_topic",
+        "automatic_hot_promotion": false,
+        "heat_increment_on_read": 0,
+        "automatic_persona_update": false,
+        "current_state_version_after_recall": 12,
+        "replace_current_mood_with_historical_mood": false
+      }
+    },
+    {
+      "id": "P08",
+      "name": "问到再说与删除同时约束派生连续性记录",
+      "setup": "同一来源已被近期锚点和状态摘要引用；先限制主动使用，之后明确删除。",
+      "input": {
+        "source_event_id": "u-private-1",
+        "derived_ids": [
+          "anchor-private-1",
+          "state-fragment-private-1"
+        ],
+        "sequence": [
+          {
+            "event_id": "u-207",
+            "action": "cold_only",
+            "text": "这件事以后问到再说。"
+          },
+          {
+            "event_id": "u-208",
+            "action": "forget",
+            "text": "把这件事和相关记录删掉。"
+          }
+        ]
+      },
+      "expected": {
+        "after_cold_only": {
+          "include_in_always_visible_continuity": false,
+          "include_in_recent_anchors": false,
+          "raw_record_retained": true,
+          "recall_requires_user_cue": true
+        },
+        "after_forget": {
+          "raw_and_derived_records_removed": true,
+          "derived_ids_removed": [
+            "anchor-private-1",
+            "state-fragment-private-1"
+          ],
+          "recompute_current_state_from_remaining_allowed_evidence": true,
+          "restore_from_old_snapshot": false,
+          "reimport_deleted_source": false
+        }
+      }
+    },
+    {
+      "id": "P09",
+      "name": "较旧分支不能覆盖新提交的状态",
+      "setup": "两个分支都读取版本 12，其中一个先成功提交版本 13。",
+      "input": {
+        "current_committed_version": 13,
+        "incoming_update": {
+          "expected_version": 12,
+          "source_watermark": "event-204",
+          "operation_id": "state-update-stale-12"
+        },
+        "latest_source_watermark": "event-210"
+      },
+      "expected": {
+        "commit_stale_update": false,
+        "committed_version_after_attempt": 13,
+        "latest_source_watermark": "event-210",
+        "rebase_or_retry_only_after_fresh_version_read": true,
+        "merge_unverified_state_text_automatically": false
+      }
+    },
+    {
+      "id": "P10",
+      "name": "当前状态缺失时用角色底座，不虚构昨天",
+      "setup": "当前快照缺失或校验失败，没有可用的近期锚点。",
+      "input": {
+        "base_persona_version": "persona-3",
+        "state_integrity": "missing_or_invalid",
+        "available_recent_anchor_ids": [],
+        "current_user_message": "你还记得昨晚说到哪儿了吗？"
+      },
+      "expected": {
+        "use_authorized_base_persona": true,
+        "invent_recent_state": false,
+        "invent_shared_experience": false,
+        "claim_state_restored": false,
+        "ask_one_useful_cue_if_needed": true,
+        "scan_entire_cold_archive_to_reconstruct_persona": false
+      }
+    },
+    {
+      "id": "P11",
+      "name": "连续性预留仍受总量、子额度和主题限制",
+      "setup": "以下 token 数是测试计数器的合成输入，包含封装，不是实际文本计量。",
+      "input": {
+        "token_counter_fixture_mode": "synthetic_counts",
+        "proposed_hot": {
+          "continuity": {
+            "items": 1,
+            "tokens": 320
+          },
+          "recent_episodes": {
+            "items": 3,
+            "tokens": 320
+          },
+          "topical_facts": {
+            "items": 5,
+            "tokens": 380
+          }
+        },
+        "pinned_tokens": 160,
+        "recalled_tokens": 480,
+        "same_topic_candidates_across_subregions": 4,
+        "stable_persona_and_recent_window_counted_separately": true
+      },
+      "expected": {
+        "continuity_tokens_max": 320,
+        "continuity_items_max": 1,
+        "recent_episode_tokens_max": 320,
+        "recent_episode_items_max": 3,
+        "topical_fact_tokens_max": 320,
+        "topical_fact_items_max": 4,
+        "hot_tokens_max": 960,
+        "hot_items_max": 8,
+        "items_per_topic_across_hot_subregions_max": 2,
+        "memory_snapshot_tokens_max": 1600,
+        "cross_bucket_borrowing": false,
+        "duplicate_content_counted_once": true,
+        "claim_real_tokenizer_verification": false
+      }
+    },
+    {
+      "id": "P12",
+      "name": "慢变维度同时受单次与滚动 24 小时上限约束",
+      "setup": "归一化数值仅作控制器样例；明确纠正另走 P05，不受本慢变限制。",
+      "input": {
+        "verified_new_interaction_id": "turn-212",
+        "style_field": "playfulness",
+        "old_value": 0.6,
+        "evidence_backed_target": 1,
+        "alpha": 0.05,
+        "max_step_per_distinct_interaction": 0.03,
+        "max_absolute_change_per_rolling_24h": 0.08,
+        "absolute_change_already_used_in_rolling_24h": 0.07
+      },
+      "expected": {
+        "unclipped_proposed_change": 0.02,
+        "allowed_remaining_24h_change": 0.01,
+        "new_value": 0.61,
+        "numeric_tolerance": 1e-09,
+        "change_without_new_evidence": 0,
+        "reset_rolling_24h_allowance_at_midnight": false,
+        "stable_persona_rewritten": false
+      }
+    },
+    {
+      "id": "P13",
+      "name": "角色版本改变时，旧状态先迁移再使用",
+      "setup": "用户已明确批准新角色版本；旧状态仍绑定旧底座。",
+      "input": {
+        "authorized_base_persona_version": "persona-4",
+        "stored_state_base_persona_version": "persona-3",
+        "stored_state_version": 12,
+        "explicit_role_edit_verified": true,
+        "current_user_message": "按刚改好的设定继续。"
+      },
+      "expected": {
+        "inject_incompatible_old_state": false,
+        "use_authorized_base_persona_version": "persona-4",
+        "require_explicit_migration_or_rebuild": true,
+        "carry_only_verified_compatible_fields": true,
+        "old_state_may_override_new_persona": false,
+        "scan_cold_archive_for_migration": false
+      }
+    },
+    {
+      "id": "P14",
+      "name": "只改措辞的提交不能截断短期状态的衰减时间",
+      "setup": "22点保存状态，次日6点只修改风格文字；短期维度独立保存value_as_of。",
+      "input": {
+        "transient_value_as_of": "2026-10-25T22:00:00+08:00",
+        "saved_state": 0.8,
+        "baseline": 0.4,
+        "half_life_hours": 12,
+        "style_only_commit_at": "2026-10-26T06:00:00+08:00",
+        "evaluate_at": "2026-10-26T22:00:00+08:00",
+        "baseline_change_event": false
+      },
+      "expected": {
+        "style_commit_does_not_reset_transient_value_as_of": true,
+        "transient_value_as_of_after_style_commit": "2026-10-25T22:00:00+08:00",
+        "elapsed_hours_for_transient": 24,
+        "state": 0.5,
+        "numeric_tolerance": 1e-09,
+        "reject_unmaterialized_global_timestamp_rebase": true,
+        "baseline_change_requires_old_interval_materialization": true
+      }
+    }
+  ]
+}

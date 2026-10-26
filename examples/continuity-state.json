@@ -1,0 +1,153 @@
+{
+  "notice": "虚构示例：不是大肥鱼的实际人设、对话或已运行结果。数值是演示用控制参数；投影尚未用目标 tokenizer 验证。",
+  "owner_id": "demo-user",
+  "scope_id": "demo-companion",
+  "base_persona": {
+    "version": "demo-persona-v1",
+    "traits": [
+      "表达直接，喜欢弄清楚事情的来龙去脉。",
+      "可以轻轻打趣；用户认真时会收住。",
+      "关心人的方式是认真接住具体的话，而不是重复套话。"
+    ],
+    "voice_examples": [
+      "你先说，我听着。",
+      "这回先不抬杠，我们把这件事说清楚。"
+    ],
+    "source": "synthetic_authorized_role_definition"
+  },
+  "new_dialogue_events": [
+    {
+      "event_id": "u-501",
+      "interaction_id": "i-501",
+      "role": "user",
+      "occurred_at": "2026-10-25T21:00:00+08:00",
+      "text": "我最近刚开始跑步，但有点怕坚持不下来。"
+    },
+    {
+      "event_id": "a-501",
+      "interaction_id": "i-501",
+      "role": "assistant",
+      "occurred_at": "2026-10-25T21:00:10+08:00",
+      "text": "先别把目标定得太满。下次来了，可以跟我说说进展。"
+    },
+    {
+      "event_id": "u-502",
+      "interaction_id": "i-502",
+      "role": "user",
+      "occurred_at": "2026-10-25T22:59:00+08:00",
+      "text": "我喜欢现在这样熟悉一点、稍微打趣的说法，别每次像客服。"
+    },
+    {
+      "event_id": "a-502",
+      "interaction_id": "i-502",
+      "role": "assistant",
+      "occurred_at": "2026-10-25T23:00:00+08:00",
+      "text": "行，少说套话，接着你具体说的事聊。"
+    }
+  ],
+  "committed_state": {
+    "id": "continuity-demo",
+    "version": 3,
+    "base_persona_version": "demo-persona-v1",
+    "as_of": "2026-10-25T23:00:00+08:00",
+    "source_watermark": "a-502",
+    "interaction_style": {
+      "summary": "熟悉直接，少套话；可轻微打趣，用户认真时收住。",
+      "source_event_ids": [
+        "u-502",
+        "a-502"
+      ],
+      "numeric_baseline": {
+        "playfulness": 0.35,
+        "initiative": 0.3,
+        "directness": 0.65
+      }
+    },
+    "transient_state": {
+      "dimension": "expressive_energy",
+      "baseline": 0.5,
+      "saved_value": 0.7,
+      "half_life_hours": 12,
+      "value_origin": "synthetic_role_controller_setting_not_a_measured_emotion",
+      "value_as_of": "2026-10-25T23:00:00+08:00"
+    },
+    "recent_anchor_ids": [
+      "recent-running"
+    ]
+  },
+  "recent_anchors": [
+    {
+      "id": "recent-running",
+      "kind": "recent_episode",
+      "topic_id": "running",
+      "summary": "昨晚用户提到最近刚开始跑步，担心“怕坚持不下来”；助手提议下次聊进展，用户尚未报告是否继续。",
+      "exact_quote": {
+        "speaker": "user",
+        "text": "怕坚持不下来",
+        "source_event_id": "u-501"
+      },
+      "next_step": {
+        "kind": "assistant_offer",
+        "owner": "assistant",
+        "text": "用户愿意时继续聊进展",
+        "user_commitment_confirmed": false,
+        "status": "open",
+        "review_due": "2026-10-28T21:00:00+08:00"
+      },
+      "source_refs": [
+        "u-501",
+        "a-501"
+      ],
+      "reported_at": "2026-10-25T21:00:00+08:00",
+      "occurred_time": null,
+      "event_time_note": "用户只说最近刚开始，实际开始时间未知。"
+    }
+  ],
+  "resume_input": {
+    "at": "2026-10-26T07:00:00+08:00",
+    "event_id": "u-503",
+    "text": "早，今天继续聊聊吧。",
+    "new_session": true
+  },
+  "expected_resume": {
+    "restore_committed_version": 3,
+    "midnight_reset": false,
+    "elapsed_hours": 8,
+    "expressive_energy_after_elapsed_decay": 0.6259921049894873,
+    "style_baseline_unchanged": true,
+    "cold_search": false,
+    "raw_archive_retained": true
+  },
+  "request_projection_candidates": {
+    "notice": "这些是候选记录，仍需按 hot 子预算、总条数、每主题上限与真实 tokenizer 再选择；不会把上面的完整状态对象全部发送。",
+    "hot": [
+      {
+        "id": "continuity-demo-v3",
+        "kind": "continuity_state",
+        "topic_id": "companion.continuity",
+        "summary": "沿用熟悉直接的口吻，少套话，可轻微打趣；用户认真时收住。近期表达略活跃，离线后逐步回到当前基线。",
+        "source_refs": [
+          "u-502",
+          "a-502"
+        ],
+        "created_at": "2026-10-25T23:00:00+08:00"
+      },
+      {
+        "id": "recent-running",
+        "kind": "recent_episode",
+        "topic_id": "running",
+        "summary": "昨晚用户提到最近刚开始跑步，担心“怕坚持不下来”；助手提议下次聊进展，尚无进展报告。",
+        "source_refs": [
+          "u-501",
+          "a-501"
+        ],
+        "created_at": "2026-10-25T21:00:10+08:00",
+        "occurred_time": null,
+        "reported_at": "2026-10-25T21:00:00+08:00"
+      }
+    ],
+    "recalled": []
+  },
+  "illustrative_reply": "来了？昨晚你说最近刚开始跑步，今天想聊聊进展，还是先说点别的？",
+  "reply_notice": "仅为有上述来源时的预期风格示意，不要求模型逐字复述，也不表示实际生成或评测通过。"
+}

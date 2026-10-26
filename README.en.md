@@ -2,17 +2,39 @@
 
 **中文：[陪伴 AI 记忆上下文 token优化](README.md)**
 
-I recently saw the “爸爸想给你完整的生命” (“Dad wants to give you a complete life”) story about Da Ha Yu, the AI companion ([Coopanion](https://github.com/Pal-AI-Lab/Coopanion)). As conversations grow, the context overflows, memories get lost, and huge amounts of tokens are used. So I designed a way for companion AIs to keep their complete memories while saving tokens.
+I recently saw the “爸爸想给你完整的生命” (“Dad wants to give you a complete life”) story about Da Fei Yu, the AI companion ([Coopanion](https://github.com/Pal-AI-Lab/Coopanion)). As conversations grow, the context overflows, memories get lost, and huge amounts of tokens are used. So I designed a way for companion AIs to keep their complete memories while saving tokens.
 
 ## How it works
 
-This follows the logic of human memory and traditional storage optimization. People don't replay their whole lives every time they talk, and an AI needn't do that either. Memories are divided into hot memories that come up often or recently, and colder memories. Day-to-day context reads only the hot memories; older things go onto the cold-memory “hard drive” and are indexed by category. When someone brings up a person, place, or event from the past that isn't in hot memory, the AI searches for it using the user's keywords. This can save a great deal of context and tokens.
+The idea draws on human memory and ordinary storage optimization: divide memory into hot and cold areas.
+
+Recent, frequently mentioned matters, the core personality, interaction habits, and recent state stay on the hot side and enter the current context. The core personality and established interaction baseline remain available; specific events are selected in small amounts when useful for the current exchange.
+
+As an old event comes up less often, its detailed representation first becomes a short summary, then gradually leaves the context for the cold archive on disk. All original dialogue is archived in full from the start. Optimization should preserve recent details and unfinished threads so that the transition feels natural, rather than making the companion feel like a different character overnight or after a session change.
+
+When the user later mentions a relevant person, time, place, object, or topic, those clues guide retrieval from the cold archive. The saving comes from avoiding repeated reading of old dialogue on every request.
 
 ## Three ground rules
 
-1. **Keep every conversation; cool down low-frequency memories.** Archive every original turn. Memories the user seldom mentions leave the active set over time. Folding an index away is not enough: old message bodies and expired recalls must also be removed from the actual model request.
+1. **Keep every conversation; cool down low-frequency events gradually.** Archive every original turn. Less-mentioned events leave the active set through “details → summary → cold archive.” Folding an index away is not enough: old message bodies and expired recalls must also be removed from the actual model request.
 2. **Bring old memories back when the user gives a clue.** “That café in Hangzhou last year” can start a search. An ordinary greeting, a timer, a tool result, or the model's own association cannot. When the clue is too vague, ask the user for one more detail.
 3. **Even frequent memories have limits.** Count only qualifying user mentions. A retry, an assistant repeating itself, or an automatic summary does not make a memory hotter. Even a frequently mentioned topic enters the request only when relevant and within the item and token limits.
+
+## Still the same companion the next day
+
+Part of what makes Da Fei Yu feel real is its familiar personality. Remembering facts is not enough if its tone suddenly changes and yesterday's state disappears the next day.
+
+An additional continuity state keeps the base personality present, lets interaction habits change slowly, and carries recent tone, unfinished threads, and two or three concrete details across days before they gradually fade. Old events and historical state versions move into the cold archive; the current personality and relationship baseline stay available rather than resetting at midnight or restart.
+
+This is still an optional design awaiting implementation. It reserves 320 tokens for continuity state, 320 for recent details, and 320 for relevant facts within the existing 960-token hot allowance. The total does not grow. Host code must actually save, restore, and limit the changes; a prompt saying “stay consistent” is not enough. See [personality and recent-state continuity](docs/persona-continuity.en.md), the [supplementary prompt](prompts/persona-continuity.en.md), and the [profile](config/continuity.example.json).
+
+In implementation, the base persona stays in the stable character prefix while recent changes use a bounded hot-memory snapshot. Both enter the current context and count toward the full input.
+
+## A gradual transition without an abrupt break
+
+Recent episodes first retain distinctive details: who said something, the wording, time, and next step. When they are mentioned less often, keep a short summary that can still support continuity before moving them to cue-only cold storage. Details and summaries are different levels of compression within hot memory. The current topic and unfinished commitments receive priority; a clock boundary alone must not remove the whole thread.
+
+The core personality and current interaction baseline do not cool with old events. Recent state changes gradually while historical state versions are archived. Every stage remains bounded by capacity, and detail selection and summary reduction must happen before the actual model request. These rules still require implementation and validation. See the [graduated-cooling design](docs/graduated-cooling.en.md).
 
 ## Finding older memories by clue
 
@@ -52,6 +74,8 @@ The real result also depends on caching, tool calls, and the cost of finding and
 4. Use the [memory extraction prompt](prompts/memory-extractor.en.md) to propose changes, then have host code verify the source before writing anything. Use the [optional cue-router prompt](prompts/cue-router.en.md) only when rules cannot decide whether a user cue is present.
 5. Use the [example policy](config/policy.example.json), [three-conversation archive sample](examples/dialogue-archive.en.json), [synthetic scenarios](examples/scenarios.en.json), and [evaluation plan](docs/evaluation.en.md) to check the intended behavior.
 
+For companionship, also use the [continuity profile](config/continuity.example.json) and integrate the [cross-day state prompt](prompts/persona-continuity.en.md) into the main-conversation supplement and separate maintenance flow. Replay the [cooling cases](examples/cooling-scenarios.en.json) for recent-detail transitions. These configuration files are design specifications whose behavior still needs implementation.
+
 **Pasting a prompt alone cannot guarantee token savings.** If the full history has already been sent to the model, telling it to “remember only what matters” does not shrink that input. The host must apply the limits before sending each request.
 
 ## Example conversations
@@ -74,6 +98,11 @@ These show intended behavior, not measured model results. Assume a past conversa
 | File | Purpose |
 | --- | --- |
 | [docs/design.en.md](docs/design.en.md) | States, heat, budgets, recall, and corrections |
+| [docs/persona-continuity.en.md](docs/persona-continuity.en.md) | Cross-day personality, recent state, details, and gradual change |
+| [docs/graduated-cooling.en.md](docs/graduated-cooling.en.md) | Transition from recent details to summary to cold storage, including capacity handling |
+| [config/continuity.example.json](config/continuity.example.json) | Optional continuity profile within the existing hot budget |
+| [examples/continuity-state.en.json](examples/continuity-state.en.json) | Synthetic cross-day state and recent-detail snapshots |
+| [examples/continuity-scenarios.en.json](examples/continuity-scenarios.en.json) | Proposed midnight, restart, gradual-change, and deletion cases |
 | [docs/cold-storage-index.en.md](docs/cold-storage-index.en.md) | Multiple index entries and progressive search by type, time, place, and more |
 | [docs/coopanion-integration.en.md](docs/coopanion-integration.en.md) | Source-backed integration points, compatibility, and implementation order |
 | [docs/evaluation.en.md](docs/evaluation.en.md) | Acceptance criteria and token, cost, and recall-quality measurements |
@@ -85,7 +114,7 @@ These show intended behavior, not measured model results. Assume a past conversa
 | [examples/recall-plan.en.json](examples/recall-plan.en.json) | A structured search from “that time in Xi'an” to “the camera purchase” |
 | [REFERENCES.en.md](REFERENCES.en.md) | Related projects, papers, and differences |
 
-The main design, integration, evaluation, references, and prompts have matching Chinese versions. Four JSON examples also have matching `.en.json` versions. The structured policy uses English field names shared by both languages.
+The main design, integration, evaluation, references, and prompts have matching Chinese versions. JSON examples also have matching `.en.json` versions. The structured policy uses English field names shared by both languages. See the [change notes](CHANGELOG.en.md).
 
 ## Development roadmap
 

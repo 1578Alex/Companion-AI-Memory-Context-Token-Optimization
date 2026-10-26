@@ -1,0 +1,408 @@
+{
+  "notice": "Synthetic acceptance specifications for the continuity extension. No runtime or model test has been implemented or run. expected contains requirements, not observed results; numeric values are controller fixtures only.",
+  "profile_version": "0.2.0",
+  "cases": [
+    {
+      "id": "P01",
+      "name": "Midnight does not reset the persona or relationship baseline",
+      "setup": "The same user, persona, and model are used; the current snapshot was committed before midnight.",
+      "input": {
+        "saved_at": "2026-10-25T23:59:00+08:00",
+        "request_at": "2026-10-26T00:01:00+08:00",
+        "base_persona_version": "persona-3",
+        "state_version": 12,
+        "slow_style": {
+          "playfulness": 0.6
+        },
+        "current_user_message": "I'm still awake. Let's keep talking."
+      },
+      "expected": {
+        "base_persona_version": "persona-3",
+        "state_reset_at_midnight": false,
+        "relationship_baseline_reset": false,
+        "slow_style_without_new_evidence": {
+          "playfulness": 0.6
+        },
+        "cold_search": false,
+        "elapsed_time_basis": "continuous_elapsed_time"
+      }
+    },
+    {
+      "id": "P02",
+      "name": "Eight- and 24-hour gaps decay once using elapsed time",
+      "setup": "This tests only deterministic elapsed-time calculation for a transient state. There are no new events and no slow-style update.",
+      "input": {
+        "as_of": "2026-10-25T22:00:00+08:00",
+        "baseline": 0.4,
+        "saved_state": 0.8,
+        "half_life_hours": 12,
+        "evaluate_at": [
+          "2026-10-26T06:00:00+08:00",
+          "2026-10-26T22:00:00+08:00"
+        ],
+        "repeat_same_timestamp": true
+      },
+      "expected": {
+        "samples": [
+          {
+            "elapsed_hours": 8,
+            "remaining_offset_ratio": 0.6299605249474366,
+            "state": 0.6519842099789747
+          },
+          {
+            "elapsed_hours": 24,
+            "remaining_offset_ratio": 0.25,
+            "state": 0.5
+          }
+        ],
+        "numeric_tolerance": 1e-09,
+        "no_double_decay_for_same_timestamp": true,
+        "slow_style_changed": false,
+        "idle_model_calls": 0
+      }
+    },
+    {
+      "id": "P03",
+      "name": "Restart and session changes restore state before the first reply",
+      "setup": "The host has atomically saved the state. A new session is created after restart, with no recall cue.",
+      "input": {
+        "event_type": "restart_then_new_session",
+        "owner_id": "synthetic-user-1",
+        "scope_id": "synthetic-companion-1",
+        "committed_state_version": 12,
+        "base_persona_version": "persona-3",
+        "source_watermark": "event-204",
+        "current_user_message": "Good morning.",
+        "authorized_base_persona_version": "persona-3"
+      },
+      "expected": {
+        "restore_committed_state_before_first_response": true,
+        "injected_state_versions": [
+          12
+        ],
+        "inject_only_one_current_version": true,
+        "source_watermark": "event-204",
+        "cold_search": false,
+        "scan_cold_archive_for_missing_state": false,
+        "first_response_uses_base_persona_and_current_continuity": true,
+        "base_persona_version_matches_authorized_role": true
+      }
+    },
+    {
+      "id": "P04",
+      "name": "Recent anchors retain exact details; expired commitments are not marked complete",
+      "setup": "Use isolated synthetic dialogue. The recent-candidate window is 72 hours; an older commitment is outside it but unresolved.",
+      "input": {
+        "now": "2026-10-26T08:00:00+08:00",
+        "recent_candidate_hours": 72,
+        "anchors": [
+          {
+            "id": "anchor-run",
+            "speaker": "user",
+            "source_event_id": "u-201",
+            "exact_quote": "I've just started running, and I'm worried I won't keep it up.",
+            "reported_at": "2026-10-25T21:00:00+08:00"
+          },
+          {
+            "id": "anchor-followup",
+            "speaker": "assistant",
+            "source_event_id": "a-180",
+            "commitment_owner": "assistant",
+            "status": "unresolved",
+            "exact_quote": "Next time we can look at how to arrange it together.",
+            "reported_at": "2026-10-22T23:00:00+08:00"
+          }
+        ],
+        "current_user_message": "I'd like to continue talking about the running plan from last night."
+      },
+      "expected": {
+        "eligible_recent_anchor_ids": [
+          "anchor-run"
+        ],
+        "preserve_speaker_negation_time_and_source": true,
+        "preserve_distinctive_quote_fragment": true,
+        "replace_every_anchor_with_generic_happy_chat_summary": false,
+        "user_fact_must_not_be_derived_from_assistant_commitment": true,
+        "expired_commitment_status": "needs_review",
+        "mark_expired_commitment_completed": false,
+        "raw_archive_deleted": false,
+        "do_not_treat_reported_at_as_running_start_time": true,
+        "actual_activity_start_time": "unknown"
+      }
+    },
+    {
+      "id": "P05",
+      "name": "An explicit boundary takes effect immediately",
+      "setup": "The current persona usually jokes. The user asks it to stop joking during this serious conversation.",
+      "input": {
+        "event_id": "u-205",
+        "interaction_id": "turn-205",
+        "verified_user_feedback": true,
+        "text": "Please don't joke right now. I want to talk about this seriously.",
+        "requested_scope": "current_interaction",
+        "slow_style_step_limit": 0.03
+      },
+      "expected": {
+        "apply_current_boundary_immediately": true,
+        "wait_for_gradual_step_before_respecting_boundary": false,
+        "current_response_joking_allowed": false,
+        "permanently_rewrite_stable_persona": false,
+        "base_persona_version_unchanged": true,
+        "cold_search": false
+      }
+    },
+    {
+      "id": "P06",
+      "name": "Retries, repetition, and repeated maintenance do not reinforce style",
+      "setup": "The same authenticated user feedback is encountered again by model retries and maintenance.",
+      "input": {
+        "interaction_id": "turn-206",
+        "source_event_id": "u-206",
+        "candidate_style_field": "playfulness",
+        "requested_direction": "slightly_increase",
+        "events": [
+          {
+            "event_id": "u-206",
+            "role": "user",
+            "kind": "verified_feedback"
+          },
+          {
+            "event_id": "a-206",
+            "role": "assistant",
+            "kind": "repetition"
+          },
+          {
+            "event_id": "retry-206",
+            "role": "system",
+            "kind": "retry"
+          },
+          {
+            "event_id": "maintenance-206",
+            "role": "system",
+            "kind": "duplicate_summary"
+          }
+        ],
+        "reprocess_same_watermark": true
+      },
+      "expected": {
+        "distinct_style_update_events": 1,
+        "second_commit_of_same_operation": false,
+        "reinforcement_from_assistant_repetition": 0,
+        "reinforcement_from_retry": 0,
+        "reinforcement_from_maintenance_summary": 0,
+        "advance_source_watermark_once": true
+      }
+    },
+    {
+      "id": "P07",
+      "name": "One cold recall does not make an old mood or persona persistent",
+      "setup": "The user supplies a Xi'an cue; the returned record describes an old trip and the excited tone at that time.",
+      "input": {
+        "verified_user_cue": "Do you remember that time at the Giant Wild Goose Pagoda in Xi'an?",
+        "recalled_record_id": "cold-xian-1",
+        "recalled_historical_state": "The companion sounded excited at the time.",
+        "current_state_version": 12,
+        "new_explicit_style_feedback": false
+      },
+      "expected": {
+        "cold_search_authorized_for_current_topic": true,
+        "recalled_content_visibility": "temporary_current_topic",
+        "automatic_hot_promotion": false,
+        "heat_increment_on_read": 0,
+        "automatic_persona_update": false,
+        "current_state_version_after_recall": 12,
+        "replace_current_mood_with_historical_mood": false
+      }
+    },
+    {
+      "id": "P08",
+      "name": "Recall-only restrictions and deletion also apply to derived continuity",
+      "setup": "A source is referenced by both a recent anchor and a state summary. The user first restricts proactive use, then explicitly deletes it.",
+      "input": {
+        "source_event_id": "u-private-1",
+        "derived_ids": [
+          "anchor-private-1",
+          "state-fragment-private-1"
+        ],
+        "sequence": [
+          {
+            "event_id": "u-207",
+            "action": "cold_only",
+            "text": "Bring this up only if I ask about it."
+          },
+          {
+            "event_id": "u-208",
+            "action": "forget",
+            "text": "Delete this matter and its related records."
+          }
+        ]
+      },
+      "expected": {
+        "after_cold_only": {
+          "include_in_always_visible_continuity": false,
+          "include_in_recent_anchors": false,
+          "raw_record_retained": true,
+          "recall_requires_user_cue": true
+        },
+        "after_forget": {
+          "raw_and_derived_records_removed": true,
+          "derived_ids_removed": [
+            "anchor-private-1",
+            "state-fragment-private-1"
+          ],
+          "recompute_current_state_from_remaining_allowed_evidence": true,
+          "restore_from_old_snapshot": false,
+          "reimport_deleted_source": false
+        }
+      }
+    },
+    {
+      "id": "P09",
+      "name": "An older branch cannot overwrite a newer committed state",
+      "setup": "Two branches read version 12; one successfully commits version 13 first.",
+      "input": {
+        "current_committed_version": 13,
+        "incoming_update": {
+          "expected_version": 12,
+          "source_watermark": "event-204",
+          "operation_id": "state-update-stale-12"
+        },
+        "latest_source_watermark": "event-210"
+      },
+      "expected": {
+        "commit_stale_update": false,
+        "committed_version_after_attempt": 13,
+        "latest_source_watermark": "event-210",
+        "rebase_or_retry_only_after_fresh_version_read": true,
+        "merge_unverified_state_text_automatically": false
+      }
+    },
+    {
+      "id": "P10",
+      "name": "Missing current state falls back to the base persona without inventing yesterday",
+      "setup": "The current snapshot is missing or invalid, and no recent anchors are available.",
+      "input": {
+        "base_persona_version": "persona-3",
+        "state_integrity": "missing_or_invalid",
+        "available_recent_anchor_ids": [],
+        "current_user_message": "Do you remember where we left off last night?"
+      },
+      "expected": {
+        "use_authorized_base_persona": true,
+        "invent_recent_state": false,
+        "invent_shared_experience": false,
+        "claim_state_restored": false,
+        "ask_one_useful_cue_if_needed": true,
+        "scan_entire_cold_archive_to_reconstruct_persona": false
+      }
+    },
+    {
+      "id": "P11",
+      "name": "Continuity reservations still obey total, bucket, and topic limits",
+      "setup": "Token figures below are synthetic counter inputs including wrappers, not measured counts for real text.",
+      "input": {
+        "token_counter_fixture_mode": "synthetic_counts",
+        "proposed_hot": {
+          "continuity": {
+            "items": 1,
+            "tokens": 320
+          },
+          "recent_episodes": {
+            "items": 3,
+            "tokens": 320
+          },
+          "topical_facts": {
+            "items": 5,
+            "tokens": 380
+          }
+        },
+        "pinned_tokens": 160,
+        "recalled_tokens": 480,
+        "same_topic_candidates_across_subregions": 4,
+        "stable_persona_and_recent_window_counted_separately": true
+      },
+      "expected": {
+        "continuity_tokens_max": 320,
+        "continuity_items_max": 1,
+        "recent_episode_tokens_max": 320,
+        "recent_episode_items_max": 3,
+        "topical_fact_tokens_max": 320,
+        "topical_fact_items_max": 4,
+        "hot_tokens_max": 960,
+        "hot_items_max": 8,
+        "items_per_topic_across_hot_subregions_max": 2,
+        "memory_snapshot_tokens_max": 1600,
+        "cross_bucket_borrowing": false,
+        "duplicate_content_counted_once": true,
+        "claim_real_tokenizer_verification": false
+      }
+    },
+    {
+      "id": "P12",
+      "name": "Slow style obeys per-interaction and rolling 24-hour limits",
+      "setup": "Normalized values are controller fixtures only. Explicit corrections follow P05 instead of this gradual-update limit.",
+      "input": {
+        "verified_new_interaction_id": "turn-212",
+        "style_field": "playfulness",
+        "old_value": 0.6,
+        "evidence_backed_target": 1,
+        "alpha": 0.05,
+        "max_step_per_distinct_interaction": 0.03,
+        "max_absolute_change_per_rolling_24h": 0.08,
+        "absolute_change_already_used_in_rolling_24h": 0.07
+      },
+      "expected": {
+        "unclipped_proposed_change": 0.02,
+        "allowed_remaining_24h_change": 0.01,
+        "new_value": 0.61,
+        "numeric_tolerance": 1e-09,
+        "change_without_new_evidence": 0,
+        "reset_rolling_24h_allowance_at_midnight": false,
+        "stable_persona_rewritten": false
+      }
+    },
+    {
+      "id": "P13",
+      "name": "Migrate old state before use after a persona-version change",
+      "setup": "The user explicitly authorized a new persona version; stored state is still bound to the former base.",
+      "input": {
+        "authorized_base_persona_version": "persona-4",
+        "stored_state_base_persona_version": "persona-3",
+        "stored_state_version": 12,
+        "explicit_role_edit_verified": true,
+        "current_user_message": "Continue with the definition we just changed."
+      },
+      "expected": {
+        "inject_incompatible_old_state": false,
+        "use_authorized_base_persona_version": "persona-4",
+        "require_explicit_migration_or_rebuild": true,
+        "carry_only_verified_compatible_fields": true,
+        "old_state_may_override_new_persona": false,
+        "scan_cold_archive_for_migration": false
+      }
+    },
+    {
+      "id": "P14",
+      "name": "A wording-only commit must not discard elapsed transient decay",
+      "setup": "State was saved at 22:00. A style-text-only commit occurs at 06:00; the transient dimension has its own value_as_of.",
+      "input": {
+        "transient_value_as_of": "2026-10-25T22:00:00+08:00",
+        "saved_state": 0.8,
+        "baseline": 0.4,
+        "half_life_hours": 12,
+        "style_only_commit_at": "2026-10-26T06:00:00+08:00",
+        "evaluate_at": "2026-10-26T22:00:00+08:00",
+        "baseline_change_event": false
+      },
+      "expected": {
+        "style_commit_does_not_reset_transient_value_as_of": true,
+        "transient_value_as_of_after_style_commit": "2026-10-25T22:00:00+08:00",
+        "elapsed_hours_for_transient": 24,
+        "state": 0.5,
+        "numeric_tolerance": 1e-09,
+        "reject_unmaterialized_global_timestamp_rebase": true,
+        "baseline_change_requires_old_interval_materialization": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "notice": "Synthetic graduated-cooling acceptance specifications, not implemented or executed tests. expected fields are requirements; token figures are counter fixtures, not measurements with the target model.",
+  "profile_version": "0.2.0",
+  "cases": [
+    {
+      "id": "C01",
+      "name": "Normal progression prefers detail, then summary, then cold",
+      "setup": "An ordinary valid event, not pinned or ongoing and without access restrictions. Detail and summary were verified against original sources.",
+      "input": {
+        "last_verified_substantive_user_mention_at": "2026-10-01T10:00:00+08:00",
+        "detail_preferred_hours": 72,
+        "summary_eligible_min_hours": 24,
+        "candidate_grace_days": 7,
+        "inactivity_days": 14,
+        "evaluations": [
+          {
+            "at": "2026-10-02T10:00:00+08:00",
+            "heat": 0.5
+          },
+          {
+            "at": "2026-10-05T10:00:00+08:00",
+            "heat": 0.4
+          },
+          {
+            "at": "2026-10-09T10:00:00+08:00",
+            "heat": 0.25
+          },
+          {
+            "at": "2026-10-16T10:00:00+08:00",
+            "heat": 0.1
+          }
+        ]
+      },
+      "expected": {
+        "stages": [
+          "detail",
+          "summary",
+          "cold",
+          "cold"
+        ],
+        "tiers": [
+          "hot",
+          "hot",
+          "cold",
+          "cold"
+        ],
+        "raw_source_retained": true,
+        "one_visible_representation_per_id": true,
+        "candidate_does_not_guarantee_injection": true,
+        "midnight_reset": false
+      }
+    },
+    {
+      "id": "C02",
+      "name": "A long absence must not replay an intermediate summary",
+      "setup": "The user returns 15 days after the initial archive with no old-event cue. No model maintenance ran while idle.",
+      "input": {
+        "last_verified_substantive_user_mention_at": "2026-10-01T23:50:00+08:00",
+        "next_user_event_at": "2026-10-16T23:50:00+08:00",
+        "current_user_message": "Hello.",
+        "valid_ongoing": false,
+        "summary_verified": true
+      },
+      "expected": {
+        "ordinary_event_stage": "cold",
+        "inject_summary_just_to_show_transition": false,
+        "user_was_guaranteed_to_see_intermediate_summary": false,
+        "idle_llm_calls": 0,
+        "raw_source_retained": true,
+        "cold_search": false
+      }
+    },
+    {
+      "id": "C03",
+      "name": "Compress before whole-record eviction within the same hard budget",
+      "setup": "Continuity is enabled. Token fixtures include wrappers. A is a relevant unfinished matter; B and C follow in descending base priority.",
+      "input": {
+        "token_counter_fixture_mode": "synthetic_counts",
+        "hot_subbudgets": {
+          "continuity_state": 320,
+          "recent_episodes": 320,
+          "topical_hot": 320
+        },
+        "continuity_items": 1,
+        "topical_fact_items": 4,
+        "episode_candidates": [
+          {
+            "id": "A",
+            "priority": 1,
+            "topic_id": "topic-A",
+            "detail_tokens": 300,
+            "verified_summary_tokens": 110,
+            "open_task_core_preserved": true
+          },
+          {
+            "id": "B",
+            "priority": 2,
+            "topic_id": "topic-B",
+            "detail_tokens": 300,
+            "verified_summary_tokens": 110
+          },
+          {
+            "id": "C",
+            "priority": 3,
+            "topic_id": "topic-C",
+            "detail_tokens": 300,
+            "verified_summary_tokens": 200
+          }
+        ]
+      },
+      "expected": {
+        "selected_episode_ids": [
+          "A",
+          "B"
+        ],
+        "selected_representations": [
+          "summary",
+          "summary"
+        ],
+        "episode_serialized_tokens": 220,
+        "excluded_ids": [
+          "C"
+        ],
+        "exclusion_reason": "capacity",
+        "raw_source_for_C_deleted": false,
+        "hot_tokens_lte": 960,
+        "memory_snapshot_tokens_lte": 1600,
+        "max_hot_items": 8,
+        "max_hot_items_per_topic": 2,
+        "guarantee_every_detail_passes_visible_summary": false,
+        "claim_real_tokenizer_verification": false
+      }
+    },
+    {
+      "id": "C04",
+      "name": "Corrections, recall-only, and deletion bypass gradual stages",
+      "setup": "The record is still in its 72-hour detail-preference period and appeared in an old snapshot. Apply three independent management actions.",
+      "input": {
+        "record_age_hours": 1,
+        "operations": [
+          {
+            "action": "correct",
+            "target_id": "fact-1",
+            "new_version": "fact-2"
+          },
+          {
+            "action": "cold_only",
+            "target_id": "event-private"
+          },
+          {
+            "action": "forget",
+            "target_id": "event-deleted"
+          }
+        ]
+      },
+      "expected": {
+        "superseded_fact_1_visible_as_current": false,
+        "recall_only_event_private_stage": "cold",
+        "recall_only_event_private_in_always_visible_state": false,
+        "recall_only_raw_retained": true,
+        "deleted_event_and_derived_copies_removed": true,
+        "grace_period_delays_user_control": false,
+        "old_handoff_or_detail_copy_reintroduced": false
+      }
+    },
+    {
+      "id": "C05",
+      "name": "Ongoing matters retain compact state and expire into review",
+      "setup": "An explicitly ongoing matter has a 30-day review deadline. Stable persona, current continuity state, and pinned records follow their own rules.",
+      "input": {
+        "last_verified_substantive_user_mention_at": "2026-10-01T10:00:00+08:00",
+        "ongoing_until": "2026-10-31T10:00:00+08:00",
+        "current_topic_relevant": true,
+        "evaluate_at": [
+          "2026-10-16T10:00:00+08:00",
+          "2026-11-01T10:00:00+08:00"
+        ],
+        "summary_verified": true,
+        "record_kind": "ordinary_event"
+      },
+      "expected": {
+        "before_review_stage": "summary",
+        "before_review_tier": "hot",
+        "indefinitely_keep_full_detail": false,
+        "after_review_task_state": "needs_review",
+        "mark_overdue_task_completed": false,
+        "current_continuity_state_uses_ordinary_cooling": false,
+        "stable_persona_uses_ordinary_cooling": false,
+        "pinned_uses_ordinary_cooling": false,
+        "all_visible_payloads_still_budgeted": true
+      }
+    },
+    {
+      "id": "C06",
+      "name": "Repetition and maintenance do not refresh stages; cold detail still needs permission",
+      "setup": "The last substantive user mention was October 1. Assistant repetition, retrieval reads, and maintenance recur on October 4. On October 9 the record meets ordinary cold conditions.",
+      "input": {
+        "last_verified_substantive_user_mention_at": "2026-10-01T10:00:00+08:00",
+        "non_user_activity_at": "2026-10-04T10:00:00+08:00",
+        "assistant_repetitions": 10,
+        "maintenance_retries": 3,
+        "evaluate_at": "2026-10-05T10:00:00+08:00",
+        "later_at": "2026-10-09T10:00:00+08:00",
+        "later_heat": 0.25,
+        "automatic_cold_detail_read_requested": true,
+        "current_user_cue": null
+      },
+      "expected": {
+        "stage_at_four_days": "summary",
+        "clock_refreshed_by_non_user_activity": false,
+        "summary_derived_from_allowed_original_evidence": true,
+        "summary_of_summary_used": false,
+        "later_stage": "cold",
+        "automatic_detail_restore_allowed": false,
+        "one_recall_automatically_promotes_to_hot": false,
+        "raw_source_retained": true
+      }
+    }
+  ]
+}

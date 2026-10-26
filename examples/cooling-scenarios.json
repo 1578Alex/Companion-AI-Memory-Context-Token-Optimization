@@ -1,0 +1,220 @@
+{
+  "notice": "虚构的渐进冷却验收规格，尚未实现或运行测试。expected 是要求；token 数为合成计数器输入，不是目标模型实测。",
+  "profile_version": "0.2.0",
+  "cases": [
+    {
+      "id": "C01",
+      "name": "正常路径先细节、再摘要、最后冷存",
+      "setup": "普通有效事件，未固定、非进行中、无权限限制；detail和summary均已从原始来源核验。",
+      "input": {
+        "last_verified_substantive_user_mention_at": "2026-10-01T10:00:00+08:00",
+        "detail_preferred_hours": 72,
+        "summary_eligible_min_hours": 24,
+        "candidate_grace_days": 7,
+        "inactivity_days": 14,
+        "evaluations": [
+          {
+            "at": "2026-10-02T10:00:00+08:00",
+            "heat": 0.5
+          },
+          {
+            "at": "2026-10-05T10:00:00+08:00",
+            "heat": 0.4
+          },
+          {
+            "at": "2026-10-09T10:00:00+08:00",
+            "heat": 0.25
+          },
+          {
+            "at": "2026-10-16T10:00:00+08:00",
+            "heat": 0.1
+          }
+        ]
+      },
+      "expected": {
+        "stages": [
+          "detail",
+          "summary",
+          "cold",
+          "cold"
+        ],
+        "tiers": [
+          "hot",
+          "hot",
+          "cold",
+          "cold"
+        ],
+        "raw_source_retained": true,
+        "one_visible_representation_per_id": true,
+        "candidate_does_not_guarantee_injection": true,
+        "midnight_reset": false
+      }
+    },
+    {
+      "id": "C02",
+      "name": "长时间离线不补演摘要过渡",
+      "setup": "用户在首次存档后15天才回来，没有旧事线索；期间无模型维护调用。",
+      "input": {
+        "last_verified_substantive_user_mention_at": "2026-10-01T23:50:00+08:00",
+        "next_user_event_at": "2026-10-16T23:50:00+08:00",
+        "current_user_message": "你好。",
+        "valid_ongoing": false,
+        "summary_verified": true
+      },
+      "expected": {
+        "ordinary_event_stage": "cold",
+        "inject_summary_just_to_show_transition": false,
+        "user_was_guaranteed_to_see_intermediate_summary": false,
+        "idle_llm_calls": 0,
+        "raw_source_retained": true,
+        "cold_search": false
+      }
+    },
+    {
+      "id": "C03",
+      "name": "同一硬预算内先压缩，再按优先级整条淘汰",
+      "setup": "启用连续性配置。以下是含封装的合成token计数。A为当前相关的未完成事项，B和C按基础排序递减。",
+      "input": {
+        "token_counter_fixture_mode": "synthetic_counts",
+        "hot_subbudgets": {
+          "continuity_state": 320,
+          "recent_episodes": 320,
+          "topical_hot": 320
+        },
+        "continuity_items": 1,
+        "topical_fact_items": 4,
+        "episode_candidates": [
+          {
+            "id": "A",
+            "priority": 1,
+            "topic_id": "topic-A",
+            "detail_tokens": 300,
+            "verified_summary_tokens": 110,
+            "open_task_core_preserved": true
+          },
+          {
+            "id": "B",
+            "priority": 2,
+            "topic_id": "topic-B",
+            "detail_tokens": 300,
+            "verified_summary_tokens": 110
+          },
+          {
+            "id": "C",
+            "priority": 3,
+            "topic_id": "topic-C",
+            "detail_tokens": 300,
+            "verified_summary_tokens": 200
+          }
+        ]
+      },
+      "expected": {
+        "selected_episode_ids": [
+          "A",
+          "B"
+        ],
+        "selected_representations": [
+          "summary",
+          "summary"
+        ],
+        "episode_serialized_tokens": 220,
+        "excluded_ids": [
+          "C"
+        ],
+        "exclusion_reason": "capacity",
+        "raw_source_for_C_deleted": false,
+        "hot_tokens_lte": 960,
+        "memory_snapshot_tokens_lte": 1600,
+        "max_hot_items": 8,
+        "max_hot_items_per_topic": 2,
+        "guarantee_every_detail_passes_visible_summary": false,
+        "claim_real_tokenizer_verification": false
+      }
+    },
+    {
+      "id": "C04",
+      "name": "更正、问到再说和删除不等待渐进",
+      "setup": "条目还在72小时细节优先期，包含于旧请求快照；分别执行三种独立管理操作。",
+      "input": {
+        "record_age_hours": 1,
+        "operations": [
+          {
+            "action": "correct",
+            "target_id": "fact-1",
+            "new_version": "fact-2"
+          },
+          {
+            "action": "cold_only",
+            "target_id": "event-private"
+          },
+          {
+            "action": "forget",
+            "target_id": "event-deleted"
+          }
+        ]
+      },
+      "expected": {
+        "superseded_fact_1_visible_as_current": false,
+        "recall_only_event_private_stage": "cold",
+        "recall_only_event_private_in_always_visible_state": false,
+        "recall_only_raw_retained": true,
+        "deleted_event_and_derived_copies_removed": true,
+        "grace_period_delays_user_control": false,
+        "old_handoff_or_detail_copy_reintroduced": false
+      }
+    },
+    {
+      "id": "C05",
+      "name": "进行中事项保护紧凑状态，过期进入复核",
+      "setup": "一项明确进行中的事项30天后复核；稳定角色、当前连续性记录和pinned采用各自规则。",
+      "input": {
+        "last_verified_substantive_user_mention_at": "2026-10-01T10:00:00+08:00",
+        "ongoing_until": "2026-10-31T10:00:00+08:00",
+        "current_topic_relevant": true,
+        "evaluate_at": [
+          "2026-10-16T10:00:00+08:00",
+          "2026-11-01T10:00:00+08:00"
+        ],
+        "summary_verified": true,
+        "record_kind": "ordinary_event"
+      },
+      "expected": {
+        "before_review_stage": "summary",
+        "before_review_tier": "hot",
+        "indefinitely_keep_full_detail": false,
+        "after_review_task_state": "needs_review",
+        "mark_overdue_task_completed": false,
+        "current_continuity_state_uses_ordinary_cooling": false,
+        "stable_persona_uses_ordinary_cooling": false,
+        "pinned_uses_ordinary_cooling": false,
+        "all_visible_payloads_still_budgeted": true
+      }
+    },
+    {
+      "id": "C06",
+      "name": "复述与维护不刷新阶段，冷细节恢复仍要许可",
+      "setup": "用户只在10月1日实质提及；10月4日助手复述、检索读取和维护各多次。10月9日记录满足普通cold条件。",
+      "input": {
+        "last_verified_substantive_user_mention_at": "2026-10-01T10:00:00+08:00",
+        "non_user_activity_at": "2026-10-04T10:00:00+08:00",
+        "assistant_repetitions": 10,
+        "maintenance_retries": 3,
+        "evaluate_at": "2026-10-05T10:00:00+08:00",
+        "later_at": "2026-10-09T10:00:00+08:00",
+        "later_heat": 0.25,
+        "automatic_cold_detail_read_requested": true,
+        "current_user_cue": null
+      },
+      "expected": {
+        "stage_at_four_days": "summary",
+        "clock_refreshed_by_non_user_activity": false,
+        "summary_derived_from_allowed_original_evidence": true,
+        "summary_of_summary_used": false,
+        "later_stage": "cold",
+        "automatic_detail_restore_allowed": false,
+        "one_recall_automatically_promotes_to_hot": false,
+        "raw_source_retained": true
+      }
+    }
+  ]
+}

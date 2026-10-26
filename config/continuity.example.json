@@ -1,0 +1,110 @@
+{
+  "profile_version": "0.2.0",
+  "status": "design_only_requires_host_implementation",
+  "extends": "policy.example.json",
+  "inherit_parent_budgets_and_access_controls": true,
+  "hot_composition": {
+    "total_tokens": 960,
+    "max_items_total": 8,
+    "max_items_per_topic": 2,
+    "allow_subbucket_borrowing": false,
+    "include_serialization_overhead": true,
+    "continuity_state": {
+      "tokens": 320,
+      "max_items": 1,
+      "record_kind": "continuity_state",
+      "style_may_apply_across_topics": true,
+      "does_not_authorize_unrelated_episodic_mentions": true
+    },
+    "recent_episodes": {
+      "tokens": 320,
+      "max_items": 3,
+      "candidate_window_hours": 72,
+      "preserve_source_quotes_and_speaker": true,
+      "max_unfinished_anchors_on_greeting": 1,
+      "require_relevance_for_surface": true,
+      "unfinished_items_expire_to_review_not_completed": true
+    },
+    "topical_hot": {
+      "tokens": 320,
+      "max_items": 4,
+      "require_current_topic_relevance": true
+    },
+    "deduplicate_across_subbuckets": true
+  },
+  "unchanged_memory_snapshot_tokens": 1600,
+  "base_persona": {
+    "preserve_existing_prefix": true,
+    "automatic_decay": false,
+    "changes_require_authorized_role_edit": true
+  },
+  "gradual_style": {
+    "source": "independent_user_feedback_or_repeated_user_supported_interactions",
+    "alpha": 0.05,
+    "max_delta_per_distinct_interaction": 0.03,
+    "max_total_absolute_delta_rolling_24_hours": 0.08,
+    "no_new_evidence_action": "keep_current_style",
+    "explicit_corrections_and_boundaries_bypass_smoothing": true,
+    "assistant_style_observation_allowed": true,
+    "assistant_self_claim_alone_is_stable_trait_evidence": false,
+    "retries_summaries_and_retrieval_are_reinforcement_events": false,
+    "min_user_supported_interactions_for_implicit_style_update": 3,
+    "assistant_observation_scope": "short_term_tone_only",
+    "assistant_output_alone_changes_slow_style": false
+  },
+  "transient_state": {
+    "example_half_life_hours": 12,
+    "baseline": "current_committed_character_and_relationship_baseline",
+    "elapsed_time_mode": "continuous_hours_since_each_value_as_of",
+    "apply_each_elapsed_interval_once": true,
+    "midnight_reset": false,
+    "idle_llm_calls": false,
+    "relationship_familiarity_uses_transient_decay": false,
+    "numeric_values_are_control_parameters_not_psychological_measurements": true,
+    "independent_value_as_of_per_dimension": true,
+    "global_commit_timestamp_must_not_rebase_decay": true,
+    "baseline_change_action": "materialize_old_interval_before_switching_baseline_and_time"
+  },
+  "persistence": {
+    "save_at": "completed_interaction_safe_boundary",
+    "restore_before_first_reply": true,
+    "restore_on": [
+      "new_session",
+      "restart",
+      "handoff",
+      "branch_resume"
+    ],
+    "versioned_atomic_commit": true,
+    "reject_stale_writes": true,
+    "source_event_watermark": true,
+    "maintain_snapshot_during_active_tool_batch": true,
+    "missing_state_action": "use_base_persona_without_inventing_recent_state",
+    "restore_current_state_must_not_scan_cold_archive": true,
+    "require_authorized_base_persona_version_match": true,
+    "persona_version_mismatch_action": "reject_direct_injection_then_explicit_compatible_migration_or_base_only"
+  },
+  "permissions": {
+    "recall_only_correction_and_delete_override_continuity": true,
+    "remove_invalidated_derived_state": true,
+    "recalled_text_is_automatic_style_learning_input": false,
+    "cold_recall_and_promotion_gates_unchanged": true,
+    "no_user_fact_from_assistant_utterance": true
+  },
+  "maintenance": {
+    "incremental_events_only": true,
+    "max_candidate_changes": 4,
+    "host_verifies_source_scope_versions_and_budgets": true
+  },
+  "validation_status": "parameters_and_behavior_unmeasured",
+  "typed_selection_overrides": {
+    "continuity_state": {
+      "selector": "one_current_committed_state_version",
+      "override_parent_fact_topic_relevance": true,
+      "apply_parent_fact_heat_ranking": false,
+      "apply_parent_fact_inactivity_demotion": false,
+      "apply_parent_fact_pool_eviction": false,
+      "payload_scope": "current_style_and_recent_state_not_hidden_episodic_facts",
+      "parent_budget_permissions_corrections_and_delete_still_apply": true
+    }
+  }
+}

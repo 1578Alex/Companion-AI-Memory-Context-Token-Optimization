@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "status": "design_only_not_a_coopanion_config",
   "budgets": {
     "memory_snapshot_tokens": 1600,
@@ -49,8 +49,65 @@
     "cold_promotion_min_interactions": 3,
     "cold_promotion_min_distinct_dates": 2,
     "ongoing_review_max_days": 30,
-    "capacity_eviction_action": "archive_without_deletion",
-    "pin_overflow_action": "report_pending_and_request_replacement"
+    "capacity_eviction_action": "verified_summary_before_eviction_then_archive_without_deletion_with_reason",
+    "pin_overflow_action": "report_pending_and_request_replacement",
+    "representation_policy": {
+      "status": "design_only_experimental_defaults",
+      "stages": [
+        "detail",
+        "summary",
+        "cold"
+      ],
+      "stage_is_not_a_new_storage_tier": true,
+      "applies_to": "ordinary_event_and_fact_cards",
+      "exclude_types": [
+        "base_persona",
+        "continuity_state",
+        "pinned"
+      ],
+      "clock": "continuous_elapsed_hours_since_last_verified_substantive_user_mention",
+      "detail_preferred_hours": 72,
+      "summary_eligible_min_hours_before_ordinary_cold": 24,
+      "ordinary_cold_not_before_candidate_grace_days": 7,
+      "ordinary_cold_trigger": "no_valid_ongoing_and_summary_eligible_interval_elapsed_and_any_ordinary_heat_or_inactivity_trigger",
+      "fresh_user_mention_can_refresh_non_cold_detail_stage": true,
+      "assistant_retry_recall_and_summary_refresh_clock": false,
+      "midnight_or_restart_resets_stage": false,
+      "prepare_source_backed_representations_from_incremental_events": true,
+      "summary_of_summary_updates": false,
+      "one_visible_representation_per_record_id": true,
+      "preserve_fields": [
+        "speaker",
+        "negation",
+        "reported_at",
+        "occurred_time_if_known",
+        "identity_and_distinctive_quote_when_needed",
+        "open_commitment_owner_conditions_and_review",
+        "source_refs"
+      ],
+      "active_ongoing_action": "retain_bounded_relevant_summary_until_review_not_unlimited_detail",
+      "expired_unresolved_commitment_action": "needs_review_not_completed",
+      "privacy_correction_delete_override_stages_immediately": true,
+      "budget_order": [
+        "enforce_permissions_status_and_current_topic_relevance",
+        "protect_bounded_current_task_or_open_commitment_core_fields",
+        "choose_age_appropriate_verified_representation",
+        "compress_low_priority_detail_to_verified_summary",
+        "evict_low_priority_whole_records_with_exclusion_reason"
+      ],
+      "ordinary_record_priority_order": [
+        "current_relevant_open_task_core_first",
+        "heat_desc",
+        "last_user_mention_at_desc",
+        "id_asc"
+      ],
+      "parent_item_topic_token_and_pool_limits_still_apply": true,
+      "summary_unavailable_action": "bounded_last_valid_detail_if_still_hot_eligible_else_exclude_or_cold_with_quality_reason",
+      "capacity_can_override_preferred_transition_with_recorded_reason": true,
+      "lazy_evaluation_may_skip_user_visible_intermediate_stage": true,
+      "cold_detail_restore_requires_existing_cue_or_promotion_permission": true,
+      "raw_source_retained_except_explicit_user_delete": true
+    }
   },
   "recall": {
     "mode": "user_cue_required",

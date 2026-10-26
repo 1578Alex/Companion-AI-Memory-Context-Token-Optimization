@@ -21,3 +21,19 @@ Not completed or demonstrated by these checks:
 - Measuring provider usage, cache hits, latency, charges, or a percentage saving.
 
 Static document and example checks cannot establish actual token savings. Logical partitions, cue permission, and outbound history projection remain implementation requirements. Future runtime validation should follow [the evaluation plan](evaluation.en.md).
+
+## 2026-10-26: Optional continuity extension checks
+
+- Added bilingual continuity design, prompts, a profile, synthetic state examples, and 14 proposed cross-day acceptance cases. All 14 repository JSON files parse; the new bilingual examples align in keys, structure, IDs, dates, and numeric values.
+- Checked hot subbudgets of 320+320+320=960, item limits of 1+3+4=8, and an unchanged memory total of 160+960+480=1600. Checked the illustrative 8/24-hour decay and rolling-24-hour step calculations. No state controller was implemented or run.
+- Relative file targets exist and Markdown fences are paired. The existing Chinese introduction only changes the incorrect name to Da Fei Yu, with the English name synchronized. Continuity sections and file links were added; other existing README wording matches the pre-change snapshot.
+- Added requirements for restart restoration, source watermarks, state versions, recent wording, explicit corrections, recall-only limits, and deletion. P01–P14 are specifications, not passed runtime tests.
+
+Not completed: host persistence and injection, real tokenizer measurements, cross-day model replay, blind evaluation, or cost measurement. These files do not establish improved character continuity for Da Fei Yu.
+
+## 2026-10-27: Publication and graduated-cooling checks
+
+- Synchronized bilingual explanations and change notes around recent events and current personality state entering context while old events cool gradually. Preserved the author's introduction and Xi'an example.
+- Added graduated-cooling design, configuration, and C01–C06 specifications. All 50 package files were reviewed structurally; all 16 JSON files parse, local link targets exist, Markdown fences are paired, and README section names are unique.
+- The 31 base, 14 continuity, and 6 cooling acceptance specifications have corresponding bilingual structures. They still await execution. The 72-hour detail period, at least 24 hours of summary eligibility, and seven-day normal-cooling grace are ordered consistently. Memory1,600 and hot960 budgets are unchanged.
+- This review covers documents, parameters, and synthetic examples, not runtime integration, cross-day blind model evaluation, or cost experiments.

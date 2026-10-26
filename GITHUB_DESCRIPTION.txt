@@ -1,1 +1,1 @@
-看到大哈鱼（Coopanion）聊久了会被上下文卡住，还有那句“爸爸想给你完整的生命”，挺触动。于是想把所有对话留在冷记忆仓库，只在需要时找回来，少花点 Token。欢迎试用提示词、一起测试。/ A cue-based memory plan for AI companions.
+陪伴 AI 的冷热记忆方案：近期细节、性格与相处状态留在上下文，旧事渐进冷存，用户给线索再找回。完整原话保留，欢迎测试。 / Hot/cold memory and personality continuity for AI companions.
