@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.2.0",
+  "spec_version": "0.3.0",
   "status": "design_only_not_a_coopanion_config",
   "budgets": {
     "memory_snapshot_tokens": 1600,
@@ -24,7 +24,10 @@
       "last_user_mention_at_desc",
       "id_asc"
     ],
-    "recall_only_overrides_pin_heat_and_ongoing": true
+    "recall_only_overrides_pin_heat_and_ongoing": true,
+    "optional_vector_ranking_profile": "vector-ranking.example.json",
+    "hot_order_is_fallback_when_vector_profile_disabled_or_unavailable": true,
+    "vector_ranking_must_preserve_priority_classes_and_type_budgets": true
   },
   "heat": {
     "eligible_source": "verified_substantive_user_mention",
@@ -124,7 +127,9 @@
     "auto_promote_on_recall": false,
     "ambiguous_or_no_hit_action": "ask_one_user_cue",
     "max_candidate_cards": 3,
-    "cards_share_recalled_item_and_token_budget": true
+    "cards_share_recalled_item_and_token_budget": true,
+    "max_index_candidates_stage": "fused_candidates_to_body_selection",
+    "optional_vector_profile_internal_refs_are_bounded_and_not_model_output": true
   },
   "context": {
     "replace_snapshot_instead_of_appending": true,

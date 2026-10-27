@@ -44,6 +44,18 @@ For example, the user might suddenly ask, “Do you remember that bowl of ganmia
 
 The full directory and every Xi'an memory stay out of the prompt. Candidate cards and final summaries share one recall allowance: at most 3 items and 480 tokens. See the [cold archive indexing design](docs/cold-storage-index.en.md) and the [structured search example](examples/recall-plan.en.json).
 
+## Selecting the memories that matter now
+
+Each event unit can have a semantic vector, a kind of “meaning coordinate.” This helps find the same event when the user describes it differently. Relevance is recalculated against the current question; it is not a permanent score attached to an event.
+
+For hot memory, filter for relevance, then rank using **vector similarity, recency, and qualifying mention frequency**, and select the top N records. N is a ceiling, not a quota. Item, topic, and token limits still apply. The host computes with the vectors; the conversation model receives only the selected short text.
+
+Cold recall follows a different rule: **a memory does not rank lower merely because it is old.** “That time in Xi'an years ago” starts with Xi'an and any later clues. If the user specifies a year, match the event's actual date. Cold recall applies no age or last-mention penalty and does not take the newest few records as if they were the whole candidate set. Keep place, time, object, and other index routes alongside semantic search so a changed vector model does not block a clear record match.
+
+The stable personality, established interaction habits, and current continuity state do not compete in ordinary-event Top N eviction. Short source-backed anchors can retain why the character was subdued yesterday or what remained unresolved. Mood may gradually settle, while familiarity and unfinished matters do not reset at midnight. The character can respond to today's circumstances too; continuity does not mean repeating the same response every day.
+
+See the [vector and Top N design](docs/vector-ranking.en.md), [profile](config/vector-ranking.example.json), and [acceptance cases](examples/vector-ranking-scenarios.en.json) for formulas, fallbacks, and limits. This is a v0.3 design awaiting implementation; its weights need calibration on real conversations.
+
 ## Initial budget suggestions
 
 These are starting values to test, not Coopanion's current settings or proven best limits. I don't currently have time to run the tests; feedback is welcome, and I'll keep improving the plan. If you find it useful, please follow me on Bilibili or any other platform: 原无奇变.
@@ -74,7 +86,7 @@ The real result also depends on caching, tool calls, and the cost of finding and
 4. Use the [memory extraction prompt](prompts/memory-extractor.en.md) to propose changes, then have host code verify the source before writing anything. Use the [optional cue-router prompt](prompts/cue-router.en.md) only when rules cannot decide whether a user cue is present.
 5. Use the [example policy](config/policy.example.json), [three-conversation archive sample](examples/dialogue-archive.en.json), [synthetic scenarios](examples/scenarios.en.json), and [evaluation plan](docs/evaluation.en.md) to check the intended behavior.
 
-For companionship, also use the [continuity profile](config/continuity.example.json) and integrate the [cross-day state prompt](prompts/persona-continuity.en.md) into the main-conversation supplement and separate maintenance flow. Replay the [cooling cases](examples/cooling-scenarios.en.json) for recent-detail transitions. These configuration files are design specifications whose behavior still needs implementation.
+For companionship, also use the [continuity profile](config/continuity.example.json) and integrate the [cross-day state prompt](prompts/persona-continuity.en.md) into the main-conversation supplement and separate maintenance flow. Replay the [cooling cases](examples/cooling-scenarios.en.json) for recent-detail transitions. Also implement event embeddings, combined hot ranking, and age-neutral cold recall using the [vector profile](config/vector-ranking.example.json). Use the [vector cases](examples/vector-ranking-scenarios.en.json) to check old-memory retrieval and state protection. These configuration files are design specifications whose behavior still needs implementation.
 
 **Pasting a prompt alone cannot guarantee token savings.** If the full history has already been sent to the model, telling it to “remember only what matters” does not shrink that input. The host must apply the limits before sending each request.
 
@@ -97,6 +109,9 @@ These show intended behavior, not measured model results. Assume a past conversa
 
 | File | Purpose |
 | --- | --- |
+| [docs/vector-ranking.en.md](docs/vector-ranking.en.md) | Event vectors, combined hot ranking, cold cue matching, and bounded Top N |
+| [config/vector-ranking.example.json](config/vector-ranking.example.json) | Optional vector-ranking profile within the existing budget |
+| [examples/vector-ranking-scenarios.en.json](examples/vector-ranking-scenarios.en.json) | Proposed old-event, persona-protection, deduplication, fallback, and deletion cases |
 | [docs/design.en.md](docs/design.en.md) | States, heat, budgets, recall, and corrections |
 | [docs/persona-continuity.en.md](docs/persona-continuity.en.md) | Cross-day personality, recent state, details, and gradual change |
 | [docs/graduated-cooling.en.md](docs/graduated-cooling.en.md) | Transition from recent details to summary to cold storage, including capacity handling |

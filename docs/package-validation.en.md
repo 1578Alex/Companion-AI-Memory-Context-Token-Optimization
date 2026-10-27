@@ -37,3 +37,13 @@ Not completed: host persistence and injection, real tokenizer measurements, cros
 - Added graduated-cooling design, configuration, and C01–C06 specifications. All 50 package files were reviewed structurally; all 16 JSON files parse, local link targets exist, Markdown fences are paired, and README section names are unique.
 - The 31 base, 14 continuity, and 6 cooling acceptance specifications have corresponding bilingual structures. They still await execution. The 72-hour detail period, at least 24 hours of summary eligibility, and seven-day normal-cooling grace are ordered consistently. Memory1,600 and hot960 budgets are unchanged.
 - This review covers documents, parameters, and synthetic examples, not runtime integration, cross-day blind model evaluation, or cost experiments.
+
+## 2026-10-27: v0.3 vector-ranking and affective-continuity checks
+
+- All 55 package files, 19 JSON files, and four JSON examples inside prompts were checked. The JSON parses, 216 relative file links resolve, Markdown fences close, and README headings are unique.
+- Chinese and English structures, numbers, and dates match across 31 base, 17 continuity, six cooling, and 14 vector cases. These are 68 requirements awaiting execution, not 68 passed runtime tests.
+- Checked illustrative hot/cold score arithmetic, weights summing to one, the unchanged 1,600 total and hot's 320/320/320 split, and no age, last-mention, or heat input to cold ranking. Distinguished up to 24 internal index references from at most 12 fused body-selection candidates.
+- Independent review led to separate hot/cold fallback and a strong-exact-evidence priority group so ordinary semantic candidates cannot evict an accurate old event solely for low vector similarity. Specifications also cover state restoration, recent affect sources, unresolved matters, and responses to new circumstances.
+- Compared with the pre-update snapshot, the author's introduction, Xi'an example, budget explanation, hypothetical 55% calculation, conversation examples, and references remain unchanged. Added explanations, profiles, and prompts are synchronized across languages.
+
+This checks documentation, parameters, synthetic arithmetic, and structure only. It does not implement a vector index, call an embedding model, or run Coopanion. Retrieval accuracy, convincing cross-day characterization, token accounting, and cost benefits remain unmeasured.

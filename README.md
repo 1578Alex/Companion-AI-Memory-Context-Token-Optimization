@@ -45,6 +45,18 @@
 
 完整目录与全部西安往事都不进入上下文。候选卡和最终摘要共用召回额度，最多 3 条 / 480 tokens。详见[逻辑分区设计](docs/cold-storage-index.md)和[结构化查询示例](examples/recall-plan.json)。
 
+## 用向量选出这次真正用得上的记忆
+
+每个“事件元”可以保存一个语义向量，像给这件事标出一个“意思坐标”。用户换个说法，也能找到同一件事；关联程度按当前问题重新计算，不是给事件永久打一个分。
+
+热记忆先筛相关内容，再把**向量关联度、时间新近度、有效提及频率**合起来排序，选靠前的 Top N 条。N 是上限，不需要凑满；条数、主题和 Token 额度仍然有效。向量在存储程序里计算，主对话只接收选中的少量文字。
+
+冷库用另一套规则：**旧事不会因为年头久就被压下去。** 问“当年西安那次”，就按西安和后续线索找；如果用户说了年份，匹配的是事件发生时间。冷召回不叠加“距今多久”的衰减，也不先取最近的几条来冒充全部候选。语义搜索之外保留地点、时间、物品等索引入口，避免换了向量模型就找不到原本明确的记录。
+
+性格底色、已经形成的相处方式和当前连续性状态不参加普通事件的 Top N 淘汰。昨天为什么低落、哪句话还没聊完，可以留下带来源的短锚点；情绪可以慢慢缓和，相处的熟悉感和没解决的事不能到零点就清零。它也会回应今天的新情况，保持连续不等于每天说同样的话。
+
+具体公式、降级规则和边界见[向量关联与 Top N 设计](docs/vector-ranking.md)、[配置](config/vector-ranking.example.json)及[验收案例](examples/vector-ranking-scenarios.json)。这是待实现的 v0.3 设计，权重尚需用真实对话校准。
+
 ## 初始预算建议
 
 以下是待实验的初始值，不是 Coopanion 现有配置，也不是最佳参数。我暂时没空来跑测试，欢迎反馈我会优化方案。如果有用欢迎关注我的 B 站或任何平台：原无奇变
@@ -75,7 +87,7 @@
 4. 用[记忆提取提示词](prompts/memory-extractor.zh.md)生成候选变更，由程序核验来源后写入；[线索判定提示词](prompts/cue-router.zh.md)仅在规则无法判断时选用。
 5. 以[示例配置](config/policy.example.json)、[三段对话归档样本](examples/dialogue-archive.json)、[合成案例](examples/scenarios.json)和[评估计划](docs/evaluation.md)验证效果。
 
-陪伴场景建议同时采用[连续性配置](config/continuity.example.json)，并按[跨天状态提示词](prompts/persona-continuity.zh.md)分别接入主对话补充与独立维护；近期细节的过渡再用[冷却案例](examples/cooling-scenarios.json)回放。配置是设计规格，需要开发者实现对应行为。
+陪伴场景建议同时采用[连续性配置](config/continuity.example.json)，并按[跨天状态提示词](prompts/persona-continuity.zh.md)分别接入主对话补充与独立维护；近期细节的过渡再用[冷却案例](examples/cooling-scenarios.json)回放。同时按[向量排序配置](config/vector-ranking.example.json)实现事件向量、热区综合排序与不惩罚年代的冷召回；用[向量案例](examples/vector-ranking-scenarios.json)检查久远记忆和状态保护。配置是设计规格，需要开发者实现对应行为。
 
 **单独粘贴提示词无法保证节省 token。** 当完整历史已经发给模型后，再要求它“只记重要的”并不会减少输入。真正的限制必须在请求发出前执行。
 
@@ -98,6 +110,9 @@
 
 | 文件 | 用途 |
 | --- | --- |
+| [docs/vector-ranking.md](docs/vector-ranking.md) | 事件向量、热区综合排序、冷库线索匹配与有限 Top N |
+| [config/vector-ranking.example.json](config/vector-ranking.example.json) | 可选向量排序配置，不增加现有预算 |
+| [examples/vector-ranking-scenarios.json](examples/vector-ranking-scenarios.json) | 久远事件、性格保护、去重、降级与删除的待验证场景 |
 | [docs/design.md](docs/design.md) | 状态迁移、热度规则、预算、召回与更正 |
 | [docs/persona-continuity.md](docs/persona-continuity.md) | 跨天性格、近期状态、具体细节与渐变规则 |
 | [docs/graduated-cooling.md](docs/graduated-cooling.md) | 近期细节到短摘要再到冷库的过渡与容量处理 |

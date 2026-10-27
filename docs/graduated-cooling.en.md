@@ -54,9 +54,9 @@ Restoring detail for a cold record still requires existing cue or promotion perm
 
 ## 4. Selection under budget pressure
 
-Filter permissions, current relevance, and independent budgets first. Prioritize necessary compact continuation information for relevant unfinished tasks or commitments. Then use the base stable ordering of heat, latest user mention, and ID for other records. Protocol-required active tool content still belongs in the bounded task allowance; a commitment is not unlimited prompt space.
+Filter permissions, current relevance, and independent budgets first. Prioritize necessary compact continuation information for relevant unfinished tasks or commitments. Then apply the configured within-group ordering (base heat order or the vector extension) to other records. Protocol-required active tool content still belongs in the bounded task allowance; a commitment is not unlimited prompt space.
 
-Use the deterministic ordinary-record ordering: relevant unfinished-task essentials first, then heat descending, latest substantive user mention descending, and ID ascending. Use the final three keys within a priority group too. Item and topic overflow requires whole-record selection in this order; compressing text cannot bypass item caps.
+Without the vector extension, use the deterministic ordinary-record ordering: relevant unfinished-task essentials first, then heat descending, latest substantive user mention descending, and ID ascending. Use the final three keys within a priority group too. With the [vector extension](vector-ranking.en.md), replace only within-group ordinary-event ranking with the combined relevance score. Heat-based transitions, unfinished-item priority, and the separate continuity-state allowance remain unchanged. Item and topic overflow requires whole-record selection in this order; compressing text cannot bypass item caps.
 
 On overflow, first try a verified summary instead of a low-priority detail view. If it still does not fit, drop low-priority whole records and record an exclusion reason such as `capacity`. The 64-record active pool, 8-record request cap, 2-record topic cap, and token subbudgets do not change. With continuity enabled, hot remains 320/320/320 and total memory remains 1,600. Pin overflow still requires explicit pin management rather than silently dropping existing pins.
 

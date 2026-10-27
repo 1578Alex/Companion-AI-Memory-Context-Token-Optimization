@@ -1,5 +1,5 @@
 {
-  "profile_version": "0.2.0",
+  "profile_version": "0.3.0",
   "status": "design_only_requires_host_implementation",
   "extends": "policy.example.json",
   "inherit_parent_budgets_and_access_controls": true,
@@ -14,7 +14,8 @@
       "max_items": 1,
       "record_kind": "continuity_state",
       "style_may_apply_across_topics": true,
-      "does_not_authorize_unrelated_episodic_mentions": true
+      "does_not_authorize_unrelated_episodic_mentions": true,
+      "protected_from_event_top_n_eviction": true
     },
     "recent_episodes": {
       "tokens": 320,
@@ -36,7 +37,8 @@
   "base_persona": {
     "preserve_existing_prefix": true,
     "automatic_decay": false,
-    "changes_require_authorized_role_edit": true
+    "changes_require_authorized_role_edit": true,
+    "participates_in_event_vector_ranking": false
   },
   "gradual_style": {
     "source": "independent_user_feedback_or_repeated_user_supported_interactions",
@@ -63,7 +65,9 @@
     "numeric_values_are_control_parameters_not_psychological_measurements": true,
     "independent_value_as_of_per_dimension": true,
     "global_commit_timestamp_must_not_rebase_decay": true,
-    "baseline_change_action": "materialize_old_interval_before_switching_baseline_and_time"
+    "baseline_change_action": "materialize_old_interval_before_switching_baseline_and_time",
+    "decay_applies_to": "short_term_intensity_and_activity_only",
+    "decay_marks_unresolved_matters_resolved": false
   },
   "persistence": {
     "save_at": "completed_interaction_safe_boundary",
@@ -104,7 +108,47 @@
       "apply_parent_fact_inactivity_demotion": false,
       "apply_parent_fact_pool_eviction": false,
       "payload_scope": "current_style_and_recent_state_not_hidden_episodic_facts",
-      "parent_budget_permissions_corrections_and_delete_still_apply": true
+      "parent_budget_permissions_corrections_and_delete_still_apply": true,
+      "apply_event_vector_score": false
     }
+  },
+  "affective_continuity": {
+    "purpose": "believable_virtual_character_expression_not_a_claim_of_subjective_feeling",
+    "layers": [
+      "stable_personality_foundation",
+      "slow_interaction_and_relationship_baseline",
+      "source_backed_recent_affect_and_triggers",
+      "bounded_unresolved_interaction_anchors"
+    ],
+    "recent_affect_fields": [
+      "affect_label",
+      "trigger_refs",
+      "observed_at",
+      "response_tendency_if_needed"
+    ],
+    "trigger_source": "verified_authorized_recent_interaction",
+    "unresolved_interaction_fields": [
+      "id",
+      "source_refs",
+      "status",
+      "review_at"
+    ],
+    "unresolved_review_max_days": 30,
+    "unresolved_review_expiry_action": "needs_review_not_resolved",
+    "unresolved_items_must_remain_permitted_relevant_and_bounded": true,
+    "elapsed_time_alone_resolves_relationship_matters": false,
+    "new_context_may_change_transient_expression": true,
+    "assistant_self_description_alone_establishes_lasting_emotional_change": false,
+    "preserve_cause_without_freezing_mood": true,
+    "historical_trigger_details_require_existing_cold_cue_permission": true
+  },
+  "vector_ranking_interop": {
+    "optional_profile": "vector-ranking.example.json",
+    "reserve_current_continuity_before_ordinary_event_selection": true,
+    "apply_to": "eligible_recent_episodes_and_topical_hot_within_each_priority_class",
+    "retain_separate_subbucket_item_and_token_caps": true,
+    "may_evict_continuity_state": false,
+    "may_rank_base_persona": false,
+    "may_bypass_cold_cue_permission": false
   }
 }

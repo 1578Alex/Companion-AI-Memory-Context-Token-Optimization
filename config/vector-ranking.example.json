@@ -1,0 +1,214 @@
+{
+  "profile_version": "0.3.0",
+  "status": "design_only_requires_host_implementation",
+  "extends": "policy.example.json",
+  "compose_with_recommended_continuity_profile": "continuity.example.json",
+  "inherit_parent_budgets_and_access_controls": true,
+  "embedding": {
+    "configured_model": null,
+    "configured_revision": null,
+    "configured_dimension": null,
+    "require_explicit_model_before_vector_comparison": true,
+    "unit_normalized": true,
+    "similarity": "clip(cosine(query,event),0,1)",
+    "similarity_is_confidence_probability": false,
+    "event_fields": [
+      "embedding_ref",
+      "embedding_model",
+      "embedding_revision",
+      "embedding_dimension",
+      "embedding_normalized",
+      "embedding_content_hash",
+      "memory_id",
+      "source_refs"
+    ],
+    "embedding_payload_host_only": true,
+    "query_source": "current_user_message_and_bounded_valid_recent_referent",
+    "archive_text_in_query_embedding_input": false,
+    "compute_all_event_pairs": false,
+    "event_update_mode": "source_verified_new_or_corrected_event_text_only",
+    "model_revision_dimension_must_match": true,
+    "migration": "bounded_incremental_or_offline_index_then_validated_atomic_switch",
+    "compare_scores_across_embedding_spaces": false
+  },
+  "eligibility": {
+    "existing_heat_and_lifecycle_unchanged": true,
+    "apply_permissions_validity_recall_only_and_current_relevance_first": true,
+    "cold_access_requires_existing_user_cue_permission": true,
+    "allow_vector_to_open_cold_gate": false,
+    "semantic_route_min_similarity": 0.55,
+    "threshold_status": "experimental_calibrate_per_model",
+    "source_backed_exact_lexical_metadata_route_bypasses_semantic_threshold": true,
+    "missing_embedding_rejects_exact_match": false,
+    "protect_required_compact_task_continuation_before_ordinary_event_ranking": true
+  },
+  "hot_ranking": {
+    "scope": "ordinary_eligible_events_within_same_priority_class_and_subbudget",
+    "score": "0.65*S + 0.20*R + 0.10*F + 0.05*O",
+    "weights": {
+      "semantic": 0.65,
+      "recency": 0.2,
+      "frequency": 0.1,
+      "ongoing": 0.05
+    },
+    "recency": "2^(-continuous_days_since_last_qualifying_user_mention/7)",
+    "recency_half_life_days": 7,
+    "frequency": "min(deduplicated_daily_capped_qualifying_mentions_in_30_days/6,1)",
+    "ongoing": "user_confirmed_active_and_before_review_deadline",
+    "tie_breakers": [
+      "last_qualifying_user_mention_desc",
+      "memory_id_asc"
+    ],
+    "add_score_to_existing_heat": false,
+    "max_pool_items": 64,
+    "vector_score_refreshes_mention_clock": false,
+    "retrieval_or_assistant_output_reinforces_heat": false
+  },
+  "cold_ranking": {
+    "score": "0.80*S + 0.20*C",
+    "weights": {
+      "semantic": 0.8,
+      "verified_cue_match": 0.2
+    },
+    "cue_match": "mean(verified_match_1_unknown_0_over_supplied_informative_cue_dimensions)",
+    "cue_dimensions": [
+      "types",
+      "occurred_time",
+      "places",
+      "people",
+      "objects",
+      "topics",
+      "explicit_event_name",
+      "explicit_source_quote"
+    ],
+    "verified_alias_or_satisfying_place_hierarchy_can_match": true,
+    "unsupplied_dimensions_penalized": false,
+    "explicit_constraints_are_filters": true,
+    "known_conflict_action": "exclude",
+    "precise_time_unknown_action": "not_a_confirmed_match_ask_before_relaxing_after_miss",
+    "vague_time_implies_exact_year": false,
+    "time_filter_field": "occurred_time",
+    "use_event_age": false,
+    "use_last_mention_recency": false,
+    "use_frequency_or_heat": false,
+    "recency_pretruncation": false,
+    "tie_breakers": [
+      "memory_id_asc"
+    ],
+    "retrieval_refreshes_clock_or_promotes": false,
+    "priority_groups": [
+      "verified_strong_exact_match_first",
+      "ordinary_candidates"
+    ],
+    "group_priority_applies_to_fused_cap_and_final_top_n": true
+  },
+  "candidate_flow": {
+    "authorized_semantic_route_max_refs": 12,
+    "authorized_lexical_metadata_route_max_refs": 12,
+    "max_internal_union_refs_before_dedup": 24,
+    "max_global_candidates_to_body_selection": 12,
+    "candidate_limit_is_per_partition": false,
+    "bounded_index_work_and_timeout_required": true,
+    "all_refs_visible_to_main_model": false,
+    "recency_presort_before_semantic_search": false,
+    "strong_exact_matches_have_independent_route": true,
+    "deduplication": [
+      "memory_id",
+      "same_source_same_event"
+    ],
+    "distinct_historical_events_must_not_merge": true,
+    "approximate_search_guarantees_archive_global_top_n": false,
+    "both_routes_are_one_bounded_retrieval_flow": true,
+    "auto_relax_filters_or_repeat_queries": false,
+    "verified_strong_exact_match": {
+      "evidence_required": true,
+      "any_of": [
+        "user_supplied_explicit_event_id_verified",
+        "user_supplied_uniquely_locating_original_quote_verified",
+        "at_least_two_independent_discriminating_user_supplied_dimensions_all_verified_without_conflict"
+      ],
+      "single_broad_city_or_topic_is_sufficient": false,
+      "C_equals_one_alone_is_sufficient": false,
+      "priority_before_ordinary_semantic_candidates": true,
+      "applies_to": [
+        "fused_cold_candidate_cap",
+        "final_cold_top_n"
+      ],
+      "group_internal_order": "cold_score_or_cold_fallback",
+      "more_than_12_action": "mark_truncated_return_only_bounded_candidate_view_and_ask_new_user_cue",
+      "overrides_permissions_explicit_filters_or_ambiguity": false
+    }
+  },
+  "fallback": {
+    "trigger": [
+      "embedding_unavailable",
+      "model_revision_dimension_mismatch",
+      "candidate_missing_comparable_vector"
+    ],
+    "mode": "uniform_typed_fallback_for_same_candidate_batch",
+    "hot": {
+      "preserve_base_relevance_priority_type_and_subbudget_rules": true,
+      "within_priority_order": [
+        "heat_desc",
+        "last_qualifying_user_mention_desc",
+        "memory_id_asc"
+      ]
+    },
+    "cold": {
+      "order": [
+        "verified_strong_exact_match_first",
+        "verified_cue_match_desc",
+        "uniform_host_lexical_score_desc",
+        "memory_id_asc"
+      ],
+      "use_recency_or_heat": false
+    },
+    "mix_vector_and_lexical_scores_in_same_batch": false,
+    "assign_missing_vector_zero_and_bury_exact_match": false,
+    "invent_similarity_score": false,
+    "record_degraded_mode": true,
+    "base_access_gates_and_budgets_unchanged": true
+  },
+  "selection": {
+    "top_n_is_ceiling_not_quota": true,
+    "max_hot_items": 8,
+    "hot_tokens": 960,
+    "max_recalled_items": 3,
+    "recalled_tokens": 480,
+    "max_hot_items_per_topic": 2,
+    "include_serialization_overhead": true,
+    "never_fill_with_irrelevant_records": true,
+    "one_visible_representation_per_event": true,
+    "ambiguous_action": "bounded_candidate_cards_or_ask_one_user_cue",
+    "selection_mode": "score_order_whole_verified_representations_that_fit",
+    "oversize_record_action": "verified_short_summary_else_skip_with_reason",
+    "allow_cross_bucket_borrowing": false,
+    "main_model_receives": "selected_source_backed_text_only"
+  },
+  "continuity_protection": {
+    "enabled_when_composed_with_continuity_profile": true,
+    "base_persona_outside_event_ranking": true,
+    "restore_current_committed_state_before_first_reply": true,
+    "require_compatible_authorized_persona_version": true,
+    "current_state_tokens": 320,
+    "current_state_max_items": 1,
+    "recent_episodes_tokens": 320,
+    "recent_episodes_max_items": 3,
+    "topical_facts_tokens": 320,
+    "topical_facts_max_items": 4,
+    "allow_subbucket_borrowing": false,
+    "current_state_competes_with_event_vectors": false,
+    "current_state_uses_event_heat_or_inactivity_cooling": false,
+    "slow_style_or_familiarity_resets_daily": false,
+    "transient_state_uses_existing_continuous_decay": true,
+    "vector_update_or_single_recall_rewrites_personality": false,
+    "old_events_can_hide_in_continuity_state": false
+  },
+  "maintenance": {
+    "invalidated_or_deleted_vectors_and_caches_removed": true,
+    "exclude_superseded_by_default": true,
+    "include_embeddings_reranking_storage_latency_in_evaluation": true,
+    "idle_llm_calls_required": false
+  },
+  "validation_status": "parameters_and_behavior_unmeasured"
+}

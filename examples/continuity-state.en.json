@@ -73,6 +73,33 @@
     },
     "recent_anchor_ids": [
       "recent-running"
+    ],
+    "recent_affect": {
+      "affect_label": "attentive_reassurance",
+      "summary": "Respond attentively to the user's concern without guaranteeing success; leave room to discuss progress if they wish.",
+      "trigger_refs": [
+        "u-501",
+        "a-501"
+      ],
+      "observed_at": "2026-10-25T21:00:10+08:00",
+      "response_tendency": "calm_specific_support",
+      "interpretation": "source_backed_character_expression_not_a_measured_subjective_emotion"
+    },
+    "unresolved_interactions": [
+      {
+        "id": "running-progress-offer",
+        "kind": "assistant_offer",
+        "summary": "The user worried about keeping up running. The assistant offered to discuss progress next time if the user wants; no progress has been reported.",
+        "source_refs": [
+          "u-501",
+          "a-501"
+        ],
+        "status": "open",
+        "commitment_owner": "assistant",
+        "user_commitment_confirmed": false,
+        "review_at": "2026-10-28T21:00:00+08:00",
+        "historical_details_anchor_id": "recent-running"
+      }
     ]
   },
   "recent_anchors": [
@@ -116,7 +143,13 @@
     "expressive_energy_after_elapsed_decay": 0.6259921049894873,
     "style_baseline_unchanged": true,
     "cold_search": false,
-    "raw_archive_retained": true
+    "raw_archive_retained": true,
+    "recent_affect_trigger_refs_retained": [
+      "u-501",
+      "a-501"
+    ],
+    "unresolved_interaction_status": "open",
+    "elapsed_decay_resolves_unfinished_matter": false
   },
   "request_projection_candidates": {
     "notice": "These are candidates. The host must still select within hot subbudgets, total item and topic caps, and the target tokenizer count. Do not send the entire stored state object above.",
@@ -125,10 +158,12 @@
         "id": "continuity-demo-v3",
         "kind": "continuity_state",
         "topic_id": "companion.continuity",
-        "summary": "Keep a familiar, direct tone with few stock phrases and light teasing; stop when the user is serious. Expression was slightly lively and should return gradually toward the current baseline during idle time.",
+        "summary": "Keep a familiar, direct tone with few stock phrases and light teasing; stop when the user is serious. Expression was slightly lively and should return gradually toward the current baseline during idle time. Meet the recent concern attentively; review unfinished matters separately rather than treating them as resolved.",
         "source_refs": [
           "u-502",
-          "a-502"
+          "a-502",
+          "u-501",
+          "a-501"
         ],
         "created_at": "2026-10-25T23:00:00+08:00"
       },
@@ -149,5 +184,6 @@
     "recalled": []
   },
   "illustrative_reply": "You're here. Last night you mentioned recently starting running. Want to talk about how it's going, or start with something else?",
-  "reply_notice": "An illustrative style example only when the sources above are available. It is not a required exact response or a measured model result."
+  "reply_notice": "An illustrative style example only when the sources above are available. It is not a required exact response or a measured model result.",
+  "profile_version": "0.3.0"
 }

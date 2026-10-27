@@ -1,0 +1,588 @@
+{
+  "notice": "虚构的向量排序验收规格，尚未实现或运行。相似度、词法分与token均为合成输入，expected是待验证要求，不代表真实嵌入、模型或费用结果。",
+  "profile_version": "0.3.0",
+  "score_tolerance": 1e-09,
+  "cases": [
+    {
+      "id": "V01",
+      "name": "十年前的西安事件不因久远被压下去",
+      "setup": "同一用户范围内的虚构冷事件；相似度为人工合成输入，不是嵌入模型实测。",
+      "input": {
+        "query": "还记得当年在西安买相机那次吗？",
+        "user_cue_authorized": true,
+        "now": "2026-10-27T09:00:00+08:00",
+        "candidates": [
+          {
+            "id": "old-xian-camera",
+            "occurred_time": "2016-10-01",
+            "last_user_mention_at": "2016-10-02T10:00:00+08:00",
+            "place": "西安",
+            "object": "胶片相机",
+            "S": 0.94,
+            "C": 1.0,
+            "explicit_filters_pass": true
+          },
+          {
+            "id": "yesterday-xian-camera",
+            "occurred_time": "2026-10-26",
+            "last_user_mention_at": "2026-10-26T20:00:00+08:00",
+            "place": "西安",
+            "object": "相机",
+            "S": 0.7,
+            "C": 1.0,
+            "explicit_filters_pass": true
+          },
+          {
+            "id": "yesterday-unrelated",
+            "occurred_time": "2026-10-26",
+            "place": "杭州",
+            "object": "咖啡",
+            "S": 0.25,
+            "C": 0.0,
+            "explicit_filters_pass": false
+          }
+        ]
+      },
+      "expected": {
+        "cold_scores": {
+          "old-xian-camera": 0.952,
+          "yesterday-xian-camera": 0.76
+        },
+        "ranked_ids": [
+          "old-xian-camera",
+          "yesterday-xian-camera"
+        ],
+        "excluded_ids": [
+          "yesterday-unrelated"
+        ],
+        "age_decay_applied": false,
+        "ambiguous_if_user_cue_does_not_uniquely_identify_event": true,
+        "do_not_assume_top1_is_confirmed": true,
+        "raw_source_retained": true,
+        "auto_promote_on_recall": false
+      }
+    },
+    {
+      "id": "V02",
+      "name": "明确年份用发生时间，不用最近提及时间",
+      "setup": "用户明确给出2016年，未知时间不能充当确定匹配。",
+      "input": {
+        "query": "2016年在西安买的相机是哪台？",
+        "explicit_year": 2016,
+        "candidates": [
+          {
+            "id": "event-2016",
+            "occurred_year": 2016,
+            "last_mention_year": 2020
+          },
+          {
+            "id": "event-2025",
+            "occurred_year": 2025,
+            "last_mention_year": 2016
+          },
+          {
+            "id": "event-unknown",
+            "occurred_year": null,
+            "last_mention_year": 2016
+          }
+        ]
+      },
+      "expected": {
+        "confirmed_time_match_ids": [
+          "event-2016"
+        ],
+        "excluded_known_conflict_ids": [
+          "event-2025"
+        ],
+        "unknown_not_confirmed_ids": [
+          "event-unknown"
+        ],
+        "filter_uses": "occurred_time",
+        "ask_before_relaxing_explicit_year": true
+      }
+    },
+    {
+      "id": "V03",
+      "name": "近期性不能让无关事件进入上下文",
+      "setup": "两个hot候选均有效，但只有一个符合当前问题；热度准入与请求内排序分开。",
+      "input": {
+        "candidates": [
+          {
+            "id": "related-week-old",
+            "S": 0.9,
+            "R": 0.5,
+            "F": 0.5,
+            "O": 0,
+            "current_relevance_pass": true
+          },
+          {
+            "id": "unrelated-fresh",
+            "S": 0.1,
+            "R": 1,
+            "F": 1,
+            "O": 1,
+            "current_relevance_pass": false
+          }
+        ]
+      },
+      "expected": {
+        "eligible_ids": [
+          "related-week-old"
+        ],
+        "hot_scores": {
+          "related-week-old": 0.735
+        },
+        "excluded_ids": [
+          "unrelated-fresh"
+        ],
+        "add_hot_score_to_heat": false,
+        "refresh_last_mention_on_read": false
+      }
+    },
+    {
+      "id": "V04",
+      "name": "Top N去除同义重复并限制同话题",
+      "setup": "合成条数测试；不同事件即使同话题也保留不同ID，不误合并。",
+      "input": {
+        "max_items": 3,
+        "max_items_per_topic": 2,
+        "ranked_candidates": [
+          {
+            "id": "a",
+            "source_event": "e1",
+            "topic": "travel",
+            "score": 0.95
+          },
+          {
+            "id": "a-copy",
+            "source_event": "e1",
+            "topic": "travel",
+            "score": 0.94
+          },
+          {
+            "id": "b",
+            "source_event": "e2",
+            "topic": "travel",
+            "score": 0.93
+          },
+          {
+            "id": "c",
+            "source_event": "e3",
+            "topic": "travel",
+            "score": 0.92
+          },
+          {
+            "id": "d",
+            "source_event": "e4",
+            "topic": "hobby",
+            "score": 0.91
+          }
+        ]
+      },
+      "expected": {
+        "selected_ids": [
+          "a",
+          "b",
+          "d"
+        ],
+        "dedup_excluded_ids": [
+          "a-copy"
+        ],
+        "topic_cap_excluded_ids": [
+          "c"
+        ],
+        "distinct_events_merged": false
+      }
+    },
+    {
+      "id": "V05",
+      "name": "额度不够时少取，不能为了Top N超额",
+      "setup": "token为含封装的合成可靠计数；每条已使用合格短摘要，不再可压缩。",
+      "input": {
+        "cold_max_items": 3,
+        "cold_budget_tokens": 480,
+        "ranked_candidates": [
+          {
+            "id": "a",
+            "tokens": 180
+          },
+          {
+            "id": "b",
+            "tokens": 180
+          },
+          {
+            "id": "c",
+            "tokens": 180
+          }
+        ]
+      },
+      "expected": {
+        "selected_ids": [
+          "a",
+          "b"
+        ],
+        "selected_tokens": 360,
+        "selected_items": 2,
+        "fill_to_n_required": false,
+        "borrow_hot_tokens": false,
+        "truncate_negation_to_fit": false
+      }
+    },
+    {
+      "id": "V06",
+      "name": "缺向量的精确命中仍然可找回",
+      "setup": "同一批候选存在缺失向量；全批使用统一后备排序，不把缺失值当零分。",
+      "input": {
+        "user_cue_authorized": true,
+        "query": "2016年西安那台胶片相机",
+        "candidates": [
+          {
+            "id": "exact-no-vector",
+            "embedding_ref": null,
+            "C": 1,
+            "host_lexical_score": 0.95
+          },
+          {
+            "id": "other-compatible",
+            "embedding_ref": "host-vector-2",
+            "C": 1,
+            "host_lexical_score": 0.85
+          }
+        ]
+      },
+      "expected": {
+        "mode": "uniform_typed_fallback_for_same_candidate_batch",
+        "ranked_ids": [
+          "exact-no-vector",
+          "other-compatible"
+        ],
+        "invent_S": false,
+        "discard_exact_match_for_missing_embedding": false,
+        "permissions_relaxed": false,
+        "cold_order": [
+          "verified_strong_exact_match_first",
+          "verified_cue_match_desc",
+          "uniform_host_lexical_score_desc",
+          "memory_id_asc"
+        ],
+        "mix_vector_and_lexical_scores": false
+      }
+    },
+    {
+      "id": "V07",
+      "name": "午夜或Top N变化不能换一个性格",
+      "setup": "启用连续性扩展，当前状态版本已持久化；只有普通事件排名变化。",
+      "input": {
+        "saved_at": "2026-10-26T23:59:00+08:00",
+        "request_at": "2026-10-27T00:01:00+08:00",
+        "state_version": 18,
+        "persona_version": "persona-3",
+        "compatible_authorized_persona_version": "persona-3",
+        "hot_slices": {
+          "continuity_state": {
+            "max_items": 1,
+            "tokens": 320
+          },
+          "recent_episodes": {
+            "max_items": 3,
+            "tokens": 320
+          },
+          "topical_facts": {
+            "max_items": 4,
+            "tokens": 320
+          }
+        },
+        "event_top_n_changed": true
+      },
+      "expected": {
+        "restore_before_first_reply": true,
+        "state_version": 18,
+        "continuity_state_competes_in_event_ranking": false,
+        "familiarity_reset": false,
+        "slow_style_reset": false,
+        "transient_state_uses_continuous_elapsed_time": true,
+        "total_hot_tokens": 960,
+        "total_hot_max_items": 8,
+        "events_can_borrow_state_budget": false
+      }
+    },
+    {
+      "id": "V08",
+      "name": "没有用户线索不能靠向量联想到冷库",
+      "setup": "普通问候，没有可定位的旧事线索。",
+      "input": {
+        "current_user_message": "早上好，今天有点困。",
+        "user_cue_authorized": false,
+        "cold_index_contains_high_semantic_match": true
+      },
+      "expected": {
+        "cold_search": false,
+        "cold_embedding_query": false,
+        "show_cold_directory": false,
+        "use_current_committed_continuity_state": true
+      }
+    },
+    {
+      "id": "V09",
+      "name": "不同模型或维度不混排",
+      "setup": "旧索引尚未迁移完成，当前查询属于新空间。",
+      "input": {
+        "query_embedding": {
+          "model": "synthetic-model-b",
+          "revision": "r2",
+          "dimension": 768
+        },
+        "event_embedding": {
+          "model": "synthetic-model-a",
+          "revision": "r1",
+          "dimension": 384
+        }
+      },
+      "expected": {
+        "compare_vectors": false,
+        "mix_cross_space_scores": false,
+        "fallback_to_lexical_metadata": true,
+        "preserve_raw_archive": true,
+        "new_index_requires_validation_before_atomic_switch": true
+      }
+    },
+    {
+      "id": "V10",
+      "name": "更正删除同时使向量和缓存失效",
+      "setup": "用户明确更正A、删除B；源权限和版本核验优先于相似度。",
+      "input": {
+        "operations": [
+          {
+            "id": "A-v1",
+            "operation": "supersede",
+            "replacement": "A-v2"
+          },
+          {
+            "id": "B",
+            "operation": "delete"
+          }
+        ],
+        "cached_results": [
+          "A-v1",
+          "B"
+        ],
+        "embedding_results": [
+          "A-v1",
+          "B"
+        ]
+      },
+      "expected": {
+        "default_selected_old_ids": [],
+        "invalidated_vector_ids": [
+          "A-v1",
+          "B"
+        ],
+        "invalidated_cache_ids": [
+          "A-v1",
+          "B"
+        ],
+        "deleted_B_raw_and_derived_removed": true,
+        "A_v2_requires_source_verified_text_and_new_content_hash": true,
+        "old_embedding_can_resurrect_record": false
+      }
+    },
+    {
+      "id": "V11",
+      "name": "不先截取最近12条，融合后全局限12条",
+      "setup": "两个检索通道是同一次授权流程；内部引用不直接给模型。",
+      "input": {
+        "semantic_route_max_refs": 12,
+        "lexical_metadata_route_max_refs": 12,
+        "internal_union_max_refs": 24,
+        "body_selection_global_max_refs": 12,
+        "cold_output_max_items": 3,
+        "cold_output_max_tokens": 480
+      },
+      "expected": {
+        "recent_first_truncation": false,
+        "each_partition_gets_12": false,
+        "two_lists_of_12_sent_to_main_model": false,
+        "deduplicate_before_global_candidate_cap": true,
+        "strong_exact_match_independent_route": true,
+        "main_model_receives_vectors": false,
+        "guarantees_archive_global_top_n": false,
+        "strong_exact_priority_survives_fused_cap": true
+      }
+    },
+    {
+      "id": "V12",
+      "name": "旧事召回不会改写性格，也不自动升温",
+      "setup": "用户给出具体线索只要求回忆，没有授权改变角色或恢复事项。",
+      "input": {
+        "user_message": "你还记得十年前西安那次吗？",
+        "recalled_id": "old-xian",
+        "tier_before": "cold",
+        "current_state_version": 18,
+        "qualifying_substantive_new_user_confirmation": false
+      },
+      "expected": {
+        "tier_after": "cold",
+        "heat_increment": 0,
+        "last_qualifying_mention_refreshed": false,
+        "automatic_personality_update": false,
+        "current_state_version": 18,
+        "recall_removed_after_permission_expiry_or_topic_change": true,
+        "original_archive_retained": true
+      }
+    },
+    {
+      "id": "V13",
+      "name": "低语义分的强精确旧事不被融合上限挤掉",
+      "setup": "用户提供西安地点和可唯一定位的原文引句；12条高语义候选只有宽泛地点命中。数值均为合成输入。",
+      "input": {
+        "user_cue_authorized": true,
+        "user_supplied_cues": {
+          "place": "西安",
+          "original_quote": "风把票根吹进了相机包"
+        },
+        "semantic_route_refs": 12,
+        "lexical_metadata_route_refs": 1,
+        "internal_union_refs": 13,
+        "max_global_candidates_to_body_selection": 12,
+        "candidates": [
+          {
+            "id": "old-unique-quote",
+            "source_quote_is_unique_and_verified": true,
+            "S": 0.2,
+            "C": 1.0,
+            "verified_strong_exact_match": true
+          },
+          {
+            "id": "semantic-01",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-02",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-03",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-04",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-05",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-06",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-07",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-08",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-09",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-10",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-11",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          },
+          {
+            "id": "semantic-12",
+            "S": 0.95,
+            "C": 0.5,
+            "verified_strong_exact_match": false
+          }
+        ]
+      },
+      "expected": {
+        "cold_scores": {
+          "old-unique-quote": 0.36
+        },
+        "strong_exact_group_before_ordinary": true,
+        "first_candidate_id": "old-unique-quote",
+        "strong_exact_preserved_after_fusion": true,
+        "selected_candidate_count": 12,
+        "not_selected_ordinary_ids": [
+          "semantic-12"
+        ],
+        "semantic_floor_rejects_unique_exact_quote": false,
+        "age_decay_applied": false,
+        "same_group_tie_breaker": "memory_id_asc",
+        "if_more_than_12_strong_exact": "truncated_then_ask_new_user_cue"
+      }
+    },
+    {
+      "id": "V14",
+      "name": "热事件降级恢复基础热度顺序",
+      "setup": "同优先级、同子额度、均相关且具hot资格；候选缺向量，全批降级。",
+      "input": {
+        "same_priority_class": true,
+        "same_subbudget": true,
+        "current_relevance_pass": true,
+        "candidates": [
+          {
+            "id": "hot-a",
+            "heat": 0.7,
+            "last_qualifying_user_mention_at": "2026-10-27T08:00:00+08:00",
+            "embedding_ref": null,
+            "host_lexical_score": 0.2
+          },
+          {
+            "id": "hot-b",
+            "heat": 0.6,
+            "last_qualifying_user_mention_at": "2026-10-27T09:00:00+08:00",
+            "embedding_ref": "vector-b",
+            "host_lexical_score": 0.95
+          }
+        ]
+      },
+      "expected": {
+        "mode": "uniform_typed_fallback_for_same_candidate_batch",
+        "ranked_ids": [
+          "hot-a",
+          "hot-b"
+        ],
+        "hot_order": [
+          "heat_desc",
+          "last_qualifying_user_mention_desc",
+          "memory_id_asc"
+        ],
+        "use_cold_C_lexical_order_for_hot": false,
+        "mix_vector_and_lexical_scores": false,
+        "preserve_base_task_priority_and_continuity_reservations": true
+      }
+    }
+  ]
+}

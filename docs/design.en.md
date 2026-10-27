@@ -1,8 +1,8 @@
-# Tiered Memory Design v0.2
+# Tiered Memory Design v0.3
 
 This design limits what the model sees **in each request** while preserving recoverable older records. It specifies behavior to implement; its example settings have not been tested with real users and are not a model of human memory.
 
-The optional [v0.2 continuity extension](persona-continuity.en.md) addresses cross-day personality, recent state, and details. The base rules still govern episodes and user facts. When enabled, divide the existing 960 hot tokens into 320 for continuity state, 320 for recent details, and 320 for topical facts. Current style state may guide tone across topics; specific events still require relevance and the existing cold-access gate. The total memory allowance does not grow.
+The optional [continuity extension](persona-continuity.en.md) addresses cross-day personality, recent state, and details. The base rules still govern episodes and user facts. When enabled, divide the existing 960 hot tokens into 320 for continuity state, 320 for recent details, and 320 for topical facts. Current style state may guide tone across topics; specific events still require relevance and the existing cold-access gate. The total memory allowance does not grow.
 
 ## 1. Separate storage from visibility
 
@@ -76,6 +76,14 @@ An ongoing-item operation additionally carries `ongoing_state=active / ended`. I
 
 Heat determines candidate retention; **relevance to the current topic determines insertion**. Do not force a frequently discussed memory into a request unrelated to it. Relevance can use keywords or local semantic similarity, with thresholds calibrated on project data. An uncalibrated vector score must not be presented as a confidence probability.
 
+### Optional combined vector ranking
+
+The [v0.3 vector extension](vector-ranking.en.md) stores a traceable semantic-vector reference for event cards and computes relevance to the current question. `heat` still controls tier eligibility and transitions. Within an existing priority class, rank hot events by `0.65*S + 0.20*R + 0.10*F + 0.05*O`, where S is semantic similarity and R/F/O retain the definitions above. Apply relevance, permission, status, and type rules first. If no compatible vector is available, use the explicit keyword/index fallback rather than mixing scores from different models.
+
+Cold recall uses `0.80*S + 0.20*cue_match`, with no event-age or last-mention decay and no newest-first candidate truncation. A user-specified event year remains a query constraint. Keep an independent route for verified place, time, object, and other exact evidence; a semantic threshold cannot veto a verified exact match. During fusion, protect the extension's strong-exact-evidence priority group from weaker semantic candidates. A single broad place or topic is not automatically strong exact evidence. Coefficients are starting values to calibrate, not factual-confidence probabilities.
+
+Top N is a ceiling, not a quota. With continuity enabled, restore the separate state allowance of 320 tokens/one record first, then select within recent details at 320/three and topical facts at 320/four. Hot remains 960/eight with at most two event records per topic. The base persona does not enter event ranking. Cold recall still requires user permission, with at most 12 fused candidates and three final items/480 tokens. See the extension for fusion and fallback rules.
+
 ## 4. User-cue gate
 
 The host grants cold-retrieval permission; the model may only propose it. Without permission, do not read cold bodies or send a cold-topic directory to the model.
@@ -94,7 +102,7 @@ The host can first apply deterministic rules, entity matching, and recent-refere
 
 ### One recall cycle
 
-1. Filter by owner, scope, status, and applicable time constraints. Search only the authorized index scope; return at most 12 initial candidates.
+1. Filter by owner, scope, status, and applicable time constraints. Search only the authorized index scope; pass at most 12 fused candidates to body selection. With vector ranking, semantic and lexical routes may each return at most 12 host-internal references, or 24 before deduplication. These are bounded index references, not 24 bodies or extra model output. Verified strong exact matches form a priority group; when it exceeds the output cap, mark truncation and ask for another cue.
 2. Check topic and source, then deduplicate. If ambiguous, use very short candidate cards to ask for another cue; read necessary summaries once the event is located. Cards and bodies together are limited to three items and 480 tokens, including wrappers. Replacing a card with its body must not append a second copy of the same ID.
 3. If nothing matches, say that no matching record was located and ask one short, useful follow-up. Do not guess between ambiguous matches. Do not automatically broaden and retry repeatedly; wait for a new user cue.
 4. Return `recall_status=matched / ambiguous / not_found / disabled` with source IDs and original event times for selected records. The program sets this status; the model cannot invent it.
@@ -107,7 +115,7 @@ Do not immediately copy a temporary recall into `PARTNER.md`, a handoff summary,
 
 The [example policy](../config/policy.example.json) limits each serialized memory block, including tags, IDs, time, provenance, and formatting, to 1,600 tokens: pinned 160, hot 960, recalled 480. Unused capacity cannot be borrowed across buckets. Leave empty slots empty. Recent history has a separate 2,000-token limit and at most six complete interactions, whichever limit is reached first.
 
-Filter invalid and irrelevant hot candidates, then select by active-task continuity, protected recent anchors, and ordinary heat priorities. Within a priority class, sort by descending heat, descending latest qualifying mention, and ascending ID. Select at most two per topic so one frequent theme cannot consume the whole budget. On overflow, first use prevalidated short summaries for lower-priority items, then exclude nonessential whole records that still do not fit. Retain negation, time, and factual qualifiers. Protected state has no unlimited allowance, and pinned overflow still requires user-visible pin management. See [graduated cooling](graduated-cooling.en.md) for representation selection, capacity exclusion, and normal cooling.
+Filter invalid and irrelevant hot candidates, then select by active-task continuity, protected recent anchors, and ordinary heat priorities. Within a priority class, the base fallback sorts by descending heat, descending latest qualifying mention, and ascending ID. When the [vector extension](vector-ranking.en.md) is enabled, use its combined hot score while retaining task priorities and the separate state allowance. Select at most two per topic so one frequent theme cannot consume the whole budget. On overflow, first use prevalidated short summaries for lower-priority items, then exclude nonessential whole records that still do not fit. Retain negation, time, and factual qualifiers. Protected state has no unlimited allowance, and pinned overflow still requires user-visible pin management. See [graduated cooling](graduated-cooling.en.md) for representation selection, capacity exclusion, and normal cooling.
 
 Illustrative request assembly, **not** an existing Coopanion API:
 

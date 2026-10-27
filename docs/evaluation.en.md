@@ -95,7 +95,7 @@ Every report must include versions, data sources, replay method, cache condition
 
 When using the [continuity extension](persona-continuity.en.md), compare base C with C2 using this profile, keeping the same 1,600-token memory allowance, model, character version, tools, and sampling settings. Record hot subbudgets, the smaller topical-fact allowance, and maintenance costs too.
 
-Replay [P01–P14](../examples/continuity-scenarios.en.json) for cross-day restoration, restarts, gradual change, recent details, corrections, deletion, and concurrency. Numeric state transitions can be tested deterministically; use separate blind evaluation for the model's character continuity and detail accuracy. A controller calculation is not a measured model result.
+Replay [P01–P17](../examples/continuity-scenarios.en.json) for cross-day restoration, restarts, gradual change, recent details, corrections, deletion, and concurrency. Numeric state transitions can be tested deterministically; use separate blind evaluation for the model's character continuity and detail accuracy. A controller calculation is not a measured model result.
 
 Record whether the first reply restores the current version, preserves recent wording and unfinished matters, changes tone abruptly, respects immediate boundaries, or changes personality after one cold recall. Measure actual tokens and costs. The goal is natural continuity with change, not identical tone in every situation. The sample parameters and intended behavior have not been validated with real-model experiments.
 
@@ -104,3 +104,13 @@ Record whether the first reply restores the current version, preserves recent wo
 Use [cooling cases C01–C06](../examples/cooling-scenarios.en.json) to check detail, summary, and cold-stage order; necessary continuity for unfinished matters; summary accuracy; capacity compression and exclusion reasons; lazy evaluation after long absence; and priority for corrections, deletion, and recall-only restrictions. Keep the existing S08 expectation of cold storage after 15 days. A gradual transition must not weaken the cold-access gate.
 
 Beyond deterministic state-machine checks, blind evaluation with real model replies must assess abrupt loss of recent details, whether summaries support natural continuation, and whether the next day feels like the same companion. Consistent documents and parameters do not establish improved experience.
+
+## 8. Additional vector-ranking and affective-continuity checks
+
+With [vector ranking](vector-ranking.en.md), compare continuity C2 with and without vectors under the same 1,600-token memory budget. Record embedding coverage, model/index versions, semantic and exact-index routes, fused candidate counts, selected IDs, deduplication and exclusion reasons, and all embedding, ranking, and maintenance costs. A shorter main-model input alone is insufficient.
+
+Replay the [vector cases](../examples/vector-ranking-scenarios.en.json): a matching ten-year-old record is not penalized for age; explicit years filter event time; paraphrases can locate events; no cue means no cold search; incompatible or missing vectors use exact-index fallback; global candidates and final Top N neither duplicate nor exceed budgets; high-scoring events cannot evict current continuity state; deletion and version changes reach vectors, summaries, and caches. These remain acceptance specifications to execute.
+
+Bucket queries by event age and report Recall@N, incorrect recalls, and the average number of follow-up cues in each bucket. Separately report missing vectors, unknown event times, and approximate-index misses. Changing only an event's age or last-mention time must not change its cold score; changing the user's requested year can change which records qualify. Synthetic arithmetic does not measure real semantic retrieval.
+
+Extend cross-day blind review: verify the source of yesterday's subdued tone, unresolved matters not being marked resolved, restored familiarity, and natural responses to new circumstances. Compare P15–P17 and the actual first outbound request. Convincing characterization needs human evaluation; storing an emotion value alone does not establish it.

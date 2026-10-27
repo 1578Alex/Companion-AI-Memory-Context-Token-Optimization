@@ -73,6 +73,33 @@
     },
     "recent_anchor_ids": [
       "recent-running"
+    ],
+    "recent_affect": {
+      "affect_label": "attentive_reassurance",
+      "summary": "认真接住用户的担心，不保证一定成功；用户愿意时可以继续聊进展。",
+      "trigger_refs": [
+        "u-501",
+        "a-501"
+      ],
+      "observed_at": "2026-10-25T21:00:10+08:00",
+      "response_tendency": "calm_specific_support",
+      "interpretation": "source_backed_character_expression_not_a_measured_subjective_emotion"
+    },
+    "unresolved_interactions": [
+      {
+        "id": "running-progress-offer",
+        "kind": "assistant_offer",
+        "summary": "用户担心能否坚持跑步；助手提出用户愿意时下次聊进展，尚无进展报告。",
+        "source_refs": [
+          "u-501",
+          "a-501"
+        ],
+        "status": "open",
+        "commitment_owner": "assistant",
+        "user_commitment_confirmed": false,
+        "review_at": "2026-10-28T21:00:00+08:00",
+        "historical_details_anchor_id": "recent-running"
+      }
     ]
   },
   "recent_anchors": [
@@ -116,7 +143,13 @@
     "expressive_energy_after_elapsed_decay": 0.6259921049894873,
     "style_baseline_unchanged": true,
     "cold_search": false,
-    "raw_archive_retained": true
+    "raw_archive_retained": true,
+    "recent_affect_trigger_refs_retained": [
+      "u-501",
+      "a-501"
+    ],
+    "unresolved_interaction_status": "open",
+    "elapsed_decay_resolves_unfinished_matter": false
   },
   "request_projection_candidates": {
     "notice": "这些是候选记录，仍需按 hot 子预算、总条数、每主题上限与真实 tokenizer 再选择；不会把上面的完整状态对象全部发送。",
@@ -125,10 +158,12 @@
         "id": "continuity-demo-v3",
         "kind": "continuity_state",
         "topic_id": "companion.continuity",
-        "summary": "沿用熟悉直接的口吻，少套话，可轻微打趣；用户认真时收住。近期表达略活跃，离线后逐步回到当前基线。",
+        "summary": "沿用熟悉直接的口吻，少套话，可轻微打趣；用户认真时收住。近期表达略活跃，离线后逐步回到当前基线。近期认真接住用户的担心；未完事项另按相关性选入，不当作已经解决。",
         "source_refs": [
           "u-502",
-          "a-502"
+          "a-502",
+          "u-501",
+          "a-501"
         ],
         "created_at": "2026-10-25T23:00:00+08:00"
       },
@@ -149,5 +184,6 @@
     "recalled": []
   },
   "illustrative_reply": "来了？昨晚你说最近刚开始跑步，今天想聊聊进展，还是先说点别的？",
-  "reply_notice": "仅为有上述来源时的预期风格示意，不要求模型逐字复述，也不表示实际生成或评测通过。"
+  "reply_notice": "仅为有上述来源时的预期风格示意，不要求模型逐字复述，也不表示实际生成或评测通过。",
+  "profile_version": "0.3.0"
 }

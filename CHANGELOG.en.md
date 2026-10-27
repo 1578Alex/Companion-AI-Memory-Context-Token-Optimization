@@ -2,6 +2,15 @@
 
 **中文：[更新说明](CHANGELOG.md)**
 
+## 2026-10-27 · v0.3 vector relevance and affective continuity
+
+- Add host-side semantic-vector references to event units. Compute relevance to the current question, combine hot relevance with recency decay and qualifying mention frequency, then select bounded Top N.
+- Apply no age or last-mention decay to cold recall. Keep exact time, place, object, and other index routes so a matching old record is not excluded merely for being old.
+- Reserve separate space for personality and current interaction state outside ordinary-event eviction. Add recent affect causes, unresolved matters, and review rules. Mood can settle naturally without resetting relationship baselines overnight or declaring unfinished matters resolved.
+- Synchronize Chinese and English designs, prompts, profiles, and acceptance cases, including vector versions, fallback, deduplication, deletion, and total cost accounting. The 1,600-token memory total and hot's 320/320/320 split remain unchanged.
+
+This release updates the specification, not a running integration. Retrieval quality, convincing characterization, and token benefits still need real-conversation testing.
+
 ## 2026-10-27 · v0.2 design update
 
 This update focuses on preserving the familiar companion from one day to the next while reducing repeated reading of old dialogue.

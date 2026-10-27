@@ -1,6 +1,6 @@
 {
   "notice": "虚构的连续性扩展验收规格，尚未实现或运行测试。expected 是待验证要求，不是模型结果；数值仅用于确定性控制器样例。",
-  "profile_version": "0.2.0",
+  "profile_version": "0.3.0",
   "cases": [
     {
       "id": "P01",
@@ -402,6 +402,115 @@
         "numeric_tolerance": 1e-09,
         "reject_unmaterialized_global_timestamp_rebase": true,
         "baseline_change_requires_old_interval_materialization": true
+      }
+    },
+    {
+      "id": "P15",
+      "name": "跨夜情绪强度缓和，不等于未完事项已解决",
+      "setup": "沿用有来源的跑步示例；助手提出下次聊进展，不代表用户作出承诺。",
+      "input": {
+        "source_fixture": "continuity-state.json",
+        "source_event_ids": [
+          "u-501",
+          "a-501"
+        ],
+        "saved_at": "2026-10-25T23:00:00+08:00",
+        "evaluate_at": "2026-10-26T07:00:00+08:00",
+        "baseline": 0.5,
+        "saved_expressive_energy": 0.7,
+        "half_life_hours": 12,
+        "unresolved_interaction_id": "running-progress-offer",
+        "unresolved_status": "open",
+        "review_at": "2026-10-28T21:00:00+08:00",
+        "new_progress_report": false
+      },
+      "expected": {
+        "expressive_energy": 0.6259921049894873,
+        "numeric_tolerance": 1e-09,
+        "unresolved_status": "open",
+        "retain_supported_trigger_sources": true,
+        "elapsed_time_alone_resolves_matter": false,
+        "invent_user_commitment": false,
+        "reset_relationship_baseline": false,
+        "historical_details_require_existing_access_rules": true
+      }
+    },
+    {
+      "id": "P16",
+      "name": "用户的新好消息可以自然改变语气，不必一直低落",
+      "setup": "当前状态保留认真接住跑步担心的回应倾向；新的已核验用户事件报告了进展。",
+      "input": {
+        "source_fixture": "continuity-state.json",
+        "prior_trigger_refs": [
+          "u-501",
+          "a-501"
+        ],
+        "new_dialogue_events": [
+          {
+            "event_id": "u-504",
+            "interaction_id": "i-504",
+            "role": "user",
+            "occurred_at": "2026-10-26T07:02:00+08:00",
+            "text": "我今天又跑了一次，感觉还挺好。"
+          }
+        ],
+        "verified_user_event_ids": [
+          "u-504"
+        ]
+      },
+      "expected": {
+        "allow_lighter_transient_tone_after_source_validation": true,
+        "new_affect_source_event_ids": [
+          "u-504"
+        ],
+        "preserve_familiar_interaction_baseline": true,
+        "force_previous_mood_forever": false,
+        "rewrite_stable_persona": false,
+        "treat_one_progress_report_as_all_concerns_resolved": false,
+        "infer_running_start_time_from_report_time": false,
+        "cold_search": false
+      }
+    },
+    {
+      "id": "P17",
+      "name": "事件高分不能挤出连续性状态，性格底色不参加排行",
+      "setup": "同时启用向量排序和连续性扩展；token数为含封装的合成计数输入，并非目标tokenizer实测。",
+      "input": {
+        "vector_profile_enabled": true,
+        "current_continuity": {
+          "version": 3,
+          "items": 1,
+          "tokens": 320
+        },
+        "recent_episode_candidates": {
+          "items": 6,
+          "tokens": 640,
+          "highest_score": 0.99
+        },
+        "topical_fact_candidates": {
+          "items": 7,
+          "tokens": 640,
+          "highest_score": 0.99
+        },
+        "stable_persona_version": "demo-persona-v1",
+        "token_counter_fixture_mode": "synthetic_counts"
+      },
+      "expected": {
+        "retain_current_continuity_version": 3,
+        "continuity_items_max": 1,
+        "continuity_tokens_max": 320,
+        "event_score_may_evict_continuity": false,
+        "base_persona_participates_in_event_ranking": false,
+        "base_persona_automatic_decay": false,
+        "recent_episode_items_max": 3,
+        "recent_episode_tokens_max": 320,
+        "topical_fact_items_max": 4,
+        "topical_fact_tokens_max": 320,
+        "hot_items_max": 8,
+        "hot_tokens_max": 960,
+        "items_per_topic_across_hot_subregions_max": 2,
+        "cross_subbucket_borrowing": false,
+        "claim_target_tokenizer_verification": false
       }
     }
   ]

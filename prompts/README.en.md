@@ -19,6 +19,10 @@ These templates accompany the [design](../docs/design.en.md). They describe mode
 - Without host-side filtering, the conversation prompt only guides phrasing. It cannot enforce cold storage, access control, or a hard input budget. Do not invoke a retrieval tool that has not actually been registered.
 - Extractor and cue-router outputs are proposals. The host independently archives every user and assistant dialogue turn. The extractor decides only which facts deserve a short memory card; an unselected turn still remains in the raw archive. Host code validates user-event origin, source, identity, ownership, length, version, and record permissions before writing or retrieving. A failed check must not expand access; an explicit user deletion removes the raw turn and its derived copies.
 
+## Ranking runs in host code
+
+The optional [vector profile](../config/vector-ranking.example.json) defines event embeddings, query similarity, hot recency weighting, and bounded Top N. Its [design](../docs/vector-ranking.en.md) excludes age penalties from cold recall. Do not send vectors, full-corpus scores, indexes, or this documentation on every turn. The main conversation still receives only text within the existing snapshot allowance, with separate continuity-state space. The extractor proposes source-backed event content, not invented embeddings or self-reported relevance scores.
+
 ## Maintenance input
 
 `new_user_events` contains only newly received, verified user messages with `event_id / interaction_id / owner_id / scope_id / occurred_at`. `candidate_records` contains a small host-selected set for resolving duplicate facts, never the whole archive on each turn. `recent_context` can resolve references, but is not a source of newly asserted facts. `allowed_record_ids` is a host-provided set of record IDs that an operation may target.
