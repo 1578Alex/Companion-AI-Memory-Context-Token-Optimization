@@ -2,6 +2,21 @@
 
 **中文：[更新说明](CHANGELOG.md)**
 
+## 2026-10-30 · v0.4 Remembering on her own, and knowing when to stay quiet
+
+This update aims to go beyond waiting for an explicit memory question and respond to “I'm exhausted today.” Past overtime does not establish today's cause. After remembering, she still needs to choose whether to ask gently or leave it unsaid.
+
+- Add proactive companion mode with user opt-in, keeping cue-based recall as the default. Recall-only, deletion, and scope restrictions always take priority.
+- Separate real experiences from the character's reflections and hypotheses. References need sources; guesses expire and cannot become facts or rewrite personality through repetition.
+- Keep separate space for core personality, interaction habits, recent state, and unfinished details. Proactive events and reflections share the existing recall allowance; the memory block remains 1,600 tokens.
+- Process new interactions only in the background, skipping runs with nothing new. The example allows at most two maintenance calls a day, counting failures, retries, and helpers. Usage and watermarks must survive restarts.
+- Add bilingual designs, prompts, a profile, and 22 proactive-recall acceptance specifications.
+- Inspect DSH's plugin and compaction interfaces and add bilingual integration guides. Plugin code, installation, and runtime tests remain unfinished.
+- Keep internal recurrent model state as a separate experiment, without promising permanent personality or detail retention after context reset. Add related-work references.
+- Add an optional Star invitation and update plans. Reading the project does not automatically act on a reader's account.
+
+This is a proposal package with no measured savings percentage. The existing 55% remains a hypothetical calculation, not a test result.
+
 ## 2026-10-27 · v0.3 vector relevance and affective continuity
 
 - Add host-side semantic-vector references to event units. Compute relevance to the current question, combine hot relevance with recency decay and qualifying mention frequency, then select bounded Top N.

@@ -1,4 +1,4 @@
-# Tiered Memory Design v0.3
+# Tiered Memory Design v0.4
 
 This design limits what the model sees **in each request** while preserving recoverable older records. It specifies behavior to implement; its example settings have not been tested with real users and are not a model of human memory.
 
@@ -15,7 +15,7 @@ For existing Coopanion conversations, integration must migrate the available ori
 | pinned | A small number of facts explicitly pinned by the user, under a separate limit | Unpinned, corrected, or deleted by the user | Yes, except on deletion |
 | hot | Only valid, relevant records that fit the budget | Low heat, no recent user mention, task expiry, or capacity eviction | Yes |
 | cold | No; its bodies, tag lists, and per-record index are never inserted automatically | A temporary retrieval authorized by a user cue, or a qualified promotion | Yes |
-| recalled | Not a new persistent tier: temporarily visible excerpts from cold records | Topic ends, authorization expires, or the budget excludes them | Original record remains cold |
+| recalled | Not a new persistent tier: temporary cold excerpts; the proactive extension may include one typed reflection within the same allowance | Topic ends, authorization expires, or the budget excludes them | Original records remain cold; reflections stay in their separate area |
 
 `status` is independent of `tier`: `valid / superseded / deleted`. A corrected fact becomes superseded and is excluded from normal recall. An explicit deletion of a conversation or memory also removes the affected original dialogue text, indexes, summaries, derived copies, and caches so it cannot be recalled or reimported. A minimal deletion marker may be retained solely to stop re-import from old logs; backup cleanup follows the published retention period.
 
@@ -86,6 +86,9 @@ Top N is a ceiling, not a quota. With continuity enabled, restore the separate s
 
 ## 4. User-cue gate
 
+The rules below describe the default `cue_only` mode. The [v0.4 proactive extension](proactive-memory.en.md), only after explicit user opt-in and host scope validation, adds bounded context/emotion triggers from the current authenticated user interaction. It does not authorize timer-driven searches, assistant associations, or recursive reflection scans of the cold archive, and cannot override recall-only, deletion, or sensitive-event restrictions. Base scenario expectations remain unchanged when the extension is disabled.
+
+
 The host grants cold-retrieval permission; the model may only propose it. Without permission, do not read cold bodies or send a cold-topic directory to the model.
 
 | Current event | Cold retrieval | Action |
@@ -123,7 +126,9 @@ Illustrative request assembly, **not** an existing Coopanion API:
 Read event identity and the current user message.
 Update qualifying mentions, versions, and expiry state without exposing the archive to the model.
 Determine whether a current user cue grants recall permission.
+Without an explicit cue, authorize bounded proactive recall only with user opt-in and a valid current-interaction scope.
 If permitted, retrieve within the authorized scope and select a few temporary excerpts.
+Check any optional reflection's source, expiry, and scope; it shares the 480 allowance with recalled events.
 Choose relevant hot records and read the bounded pinned set.
 Serialize one memory_snapshot under the individual item and token limits.
 Build a bounded recent-history projection, excluding expired recalls and cooled duplicates.
@@ -136,6 +141,7 @@ This is a logical sequence. Actual message roles and ordering must comply with t
 ### Required constraints
 
 - `memory_snapshot` replaces the previous snapshot; do not append another copy every turn. The same fact should not be repeated in `PARTNER.md`, recent summaries, tool results, and the snapshot.
+- The proactive extension keeps the same 1,600 total: at most two proactive events and one optional reflection share recalled's three items/480 tokens. A reflection has a 96-token limit including wrappers, retains its type and source, and is not a fact. Disabling the extension restores the base mode.
 - The full user-and-assistant dialogue history must remain in the host-controlled cold archive, except for explicitly deleted material, but cannot be sent in full without filtering. Old recall tool results and the assistant's retellings of old facts can bypass cold storage. Filter the outbound projection using provenance, or replace them with verified, bounded current-task state.
 - Do not split a live tool call from its result or drop reasoning fields required by the provider for the current turn. Rebuild context at a safe tool-transaction boundary when old memories must be removed. If the budget still cannot fit a valid transaction, stop a new batch or explicitly report the limit rather than sending an invalid protocol sequence.
 - Cold content already in a live tool transaction may be used only within that transaction and its valid topic permission. After a topic change or expiry, finish the old transaction before processing the new user event through a clean projection. Do not extend permission indefinitely just to keep a tool loop going.

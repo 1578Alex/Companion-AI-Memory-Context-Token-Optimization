@@ -175,3 +175,7 @@ The host must separately persist current `continuity_state`: committed version, 
 Maintenance proposes changes only from bounded new events. The host applies continuous elapsed time and bounded incremental updates; midnight does not reset state, and recalls or retries do not reinforce personality. Explicit corrections and boundaries apply immediately. Restoring the authorized current state is not permission to read cold records or rebuild an unauthorized present personality from ancient events.
 
 Before rollout, replay the [cross-day scenarios](../examples/continuity-scenarios.en.json). Inspect the state and details actually present in the first outbound request, token limits, and model replies. Existing files and parseable JSON do not establish cross-day character consistency.
+
+## v0.4 integration addition
+
+Implement mode selection, authenticated current-user triggers, expression decisions, a separate reflection store, and a persistent maintenance ledger according to the [proactive extension](proactive-memory.en.md). Keep the default cue gate. Opt-in grants bounded access only for the current interaction, topic, and permitted categories; the model saying it remembers grants no permission. Track derived sources through corrections, deletion, and later summaries to prevent old guesses reentering as facts. DSH has a different plugin interface: see its [separate notes](dsh-plugin.en.md), rather than applying Cortico integration points to it.

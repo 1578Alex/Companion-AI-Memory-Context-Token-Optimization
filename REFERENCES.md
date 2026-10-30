@@ -73,3 +73,11 @@
 - [Coopanion #375](https://github.com/Pal-AI-Lab/Coopanion/pull/375)：已有按主题、日期整理工作区与 `archive/` 的约定。此次方案仍须证明自己的增量作用。
 
 冷资料未进入模型输入时，不产生该部分主请求输入 token；但索引、检索、摘要、维护、工具往返和缓存失效仍可能增加成本。检验时应同时记录实际输入、缓存输入、输出、额外调用、维护费用、延迟与记忆正确率。只写一份提示词不能保证外部存储、强制预算或权限门控已经生效。
+
+## v0.4：主动回忆、反思与循环状态
+
+- [Generative Agents（2023）](https://arxiv.org/abs/2304.03442)：体验记录、检索与高层反思已有研究；主动回忆不能单独作为首创声明。
+- [Letta 记忆与 dreaming](https://docs.letta.com/configuration/memory)：后台整理与反思已有实现思路；本方案强调来源隔离、表达判断和后台预算，不声称这些大方向首次出现。
+- [Qwen3.8-27B 官方模型说明](https://huggingface.co/Qwen/Qwen3.8-27B/blob/main/README.md)与[Gated DeltaNet研究](https://research.nvidia.com/publication/2025-04_gated-delta-networks-improving-mamba2-delta-rule)：仅支持架构与状态机制依据，不证明清空上下文后永久保留人格。
+
+以上于2026-10-30核对。用户提供的第三方控制台截图用于理解需求，未当作公开源码、性能测试或已验证兼容性的证据，也未上传截图或其中的私人对话。DSH的固定版本依据见其单独接入说明。

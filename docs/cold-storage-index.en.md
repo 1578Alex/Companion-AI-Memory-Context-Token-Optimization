@@ -1,5 +1,7 @@
 # Logical Partitions and Progressive Recall of Distant Memories
 
+This file describes default cued retrieval. After explicit opt-in to [proactive mode](proactive-memory.en.md), the host may grant bounded access for the current interaction. The same indexes, permissions, provenance, and budgets apply. Background reflection has no cold-scan permission.
+
 Keep the complete user-and-assistant dialogue in a host-managed cold archive, then build composable indexes over its messages or episodes by **type, time, place, person, object, and topic**. Every conversation remains stored even when it has no useful facet or separate fact card. Any sufficiently discriminating cue from the user can serve as the first entry point. Later turns can add constraints to locate the exact event. The user does not need to provide every field at once.
 
 This is a specification to implement. Logical partitions can be database indexes and metadata filters; no physical disk partitions or immediate vector database adoption are required.

@@ -1,5 +1,5 @@
 {
-  "profile_version": "0.3.0",
+  "profile_version": "0.4.0",
   "status": "design_only_requires_host_implementation",
   "extends": "policy.example.json",
   "compose_with_recommended_continuity_profile": "continuity.example.json",
@@ -34,7 +34,9 @@
   "eligibility": {
     "existing_heat_and_lifecycle_unchanged": true,
     "apply_permissions_validity_recall_only_and_current_relevance_first": true,
-    "cold_access_requires_existing_user_cue_permission": true,
+    "default_cold_access_requires_existing_user_cue_permission": true,
+    "optional_proactive_permission_profile": "proactive.example.json",
+    "proactive_exception_requires_explicit_opt_in_and_host_valid_current_interaction_scope": true,
     "allow_vector_to_open_cold_gate": false,
     "semantic_route_min_similarity": 0.55,
     "threshold_status": "experimental_calibrate_per_model",
@@ -71,6 +73,8 @@
       "verified_cue_match": 0.2
     },
     "cue_match": "mean(verified_match_1_unknown_0_over_supplied_informative_cue_dimensions)",
+    "no_supplied_cue_dimensions_under_valid_proactive_permit": "C_equals_0_without_renormalizing_weights",
+    "inferred_scope_or_candidate_content_counts_as_user_cue": false,
     "cue_dimensions": [
       "types",
       "occurred_time",

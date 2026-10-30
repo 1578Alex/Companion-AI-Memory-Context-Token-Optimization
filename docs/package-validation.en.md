@@ -47,3 +47,14 @@ Not completed: host persistence and injection, real tokenizer measurements, cros
 - Compared with the pre-update snapshot, the author's introduction, Xi'an example, budget explanation, hypothetical 55% calculation, conversation examples, and references remain unchanged. Added explanations, profiles, and prompts are synchronized across languages.
 
 This checks documentation, parameters, synthetic arithmetic, and structure only. It does not implement a vector index, call an embedding model, or run Coopanion. Retrieval accuracy, convincing cross-day characterization, token accounting, and cost benefits remain unmeasured.
+
+## 2026-10-30: v0.4 proactive recall, separate reflections, and DSH integration review
+
+- All 68 package files, 22 JSON files, and four JSON examples inside prompts were checked. JSON parses, 302 relative file links resolve, Markdown fences close, and README headings are unique.
+- Nine bilingual JSON example pairs align in keys, counts, numbers, dates, and scenario IDs: 31 base, 17 continuity, six cooling, 14 vector, and 22 proactive cases. These are 90 acceptance specifications awaiting execution, not 90 passed runtime tests.
+- Checked the unchanged 1,600 memory total and hot's 320/320/320 split. At most two proactive events and one optional reflection share recalled's three items/480 tokens; the 96-token reflection cap adds no allowance. Illustrative background arithmetic aligns at two attempts, 2,000/300 per call, and 4,000/600 per day.
+- Independent review clarified the composed-profile proactive-permit exception, C=0 without invented exact clues when no verifiable dimensions are supplied, and reflection storage lifetime never extending cold-source visibility. Added A21–A22 for future replay; no model behavior tests were executed.
+- The DSH review checked local package identifiers and a public source snapshot, documenting version differences, accumulating history, official compaction interfaces, and a persistent reservation ledger. No DSH plugin was coded, installed, or run, and the application was not modified.
+- Comparison with the pre-publication snapshot preserves the author's introduction, Xi'an example, budget explanation, hypothetical 55% calculation, conversation examples, and existing reference section. New proactive, plugin, and experiment documents are bilingual. The Star invitation is voluntary; reading the project authorizes no account actions.
+
+This is a document, profile, and synthetic-example review only. No real-request token measurements, cross-day blind evaluation, retrieval-accuracy measurement, running ledger tests, or cost experiments were performed. Recurrent state has not been tested either. There is no measured savings percentage.

@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.3.0",
+  "spec_version": "0.4.0",
   "status": "design_only_not_a_coopanion_config",
   "budgets": {
     "memory_snapshot_tokens": 1600,
@@ -129,7 +129,9 @@
     "max_candidate_cards": 3,
     "cards_share_recalled_item_and_token_budget": true,
     "max_index_candidates_stage": "fused_candidates_to_body_selection",
-    "optional_vector_profile_internal_refs_are_bounded_and_not_model_output": true
+    "optional_vector_profile_internal_refs_are_bounded_and_not_model_output": true,
+    "optional_proactive_profile": "proactive.example.json",
+    "base_mode_applies_unless_explicit_host_validated_proactive_opt_in": true
   },
   "context": {
     "replace_snapshot_instead_of_appending": true,

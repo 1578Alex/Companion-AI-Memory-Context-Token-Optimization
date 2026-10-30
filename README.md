@@ -15,10 +15,20 @@
 
 等用户再提到相关的人、时间、地点、物品或话题，就按线索去冷库找回来。省下的是每次都重复读取旧话的上下文和 Token。
 
+## 她可以主动想起，但不用什么都说
+
+这次补了一种可选的“主动陪伴模式”。你说“好累”，她可以想起你之前提过的加班，再问一句“今天也是工作上的事吗？”；关联不大、你不想聊，或者刚问过，就不提。
+
+真实发生的事和她自己的猜想分开保存。“我有点担心他”可以是她的念头，不能慢慢变成“他肯定出事了”。反思可以帮助她整理相处方式，但不能靠反复猜测把自己变成另一个性格。
+
+性格底色、熟悉的说话方式和近期细节继续保留。旧事照样完整留底；每次只带少量相关内容。后台没新内容就不想，有内容也限次数、限 Token，避免省了聊天的钱、又花在空转上。
+
+默认仍是用户给线索才查旧事；主动模式需要明确开启。目前更新的是方案和提示词，尚未接入运行。详见[主动回忆与反思设计](docs/proactive-memory.md)和[提示词](prompts/proactive-companion.zh.md)。
+
 ## 三条核心规则
 
 1. **全部对话留底，低频渐进冷存。** 每轮原文都归档；少被用户提及的事件按“细节 → 摘要 → 冷库”逐步退出活跃区。只把目录折叠起来不够，还要从实际模型请求中移除旧正文与旧召回片段。
-2. **用户线索唤回。** “去年杭州那家咖啡店”可以启动检索；普通问候、定时唤醒、工具输出或模型自己想起某件事不能启动冷检索。线索模糊时，请用户补充一句。
+2. **默认按用户线索唤回。** “去年杭州那家咖啡店”可以启动检索；普通问候、定时唤醒、工具输出或模型自己想起某件事不能启动冷检索。线索模糊时，请用户补充一句。
 3. **高频调用有限。** 只统计用户的有效提及，同一轮重试、助手复述、自动摘要不增加热度；即便高频，也只注入与当前对话有关的少量条目。
 
 ## 第二天还是昨天那个它
@@ -57,6 +67,12 @@
 
 具体公式、降级规则和边界见[向量关联与 Top N 设计](docs/vector-ranking.md)、[配置](config/vector-ranking.example.json)及[验收案例](examples/vector-ranking-scenarios.json)。这是待实现的 v0.3 设计，权重尚需用真实对话校准。
 
+## 本地桌宠与 DeepSeek Harness
+
+这套方案可以面向 DeepSeek Harness（DSH）设计插件。需要把记忆存储、请求前筛选和预算控制真正接进程序，粘贴提示词还不够。当前插件能力与接入边界见[DSH 说明](docs/dsh-plugin.md)；本仓库暂不把方案包说成已安装可运行的插件。
+
+模型内部循环状态也列为[实验方向](docs/recurrent-state-experiment.md)：试验它能否在少读历史的情况下延续角色，但不能先承诺“清空上下文也永不失忆”。
+
 ## 初始预算建议
 
 以下是待实验的初始值，不是 Coopanion 现有配置，也不是最佳参数。我暂时没空来跑测试，欢迎反馈我会优化方案。如果有用欢迎关注我的 B 站或任何平台：原无奇变
@@ -89,6 +105,8 @@
 
 陪伴场景建议同时采用[连续性配置](config/continuity.example.json)，并按[跨天状态提示词](prompts/persona-continuity.zh.md)分别接入主对话补充与独立维护；近期细节的过渡再用[冷却案例](examples/cooling-scenarios.json)回放。同时按[向量排序配置](config/vector-ranking.example.json)实现事件向量、热区综合排序与不惩罚年代的冷召回；用[向量案例](examples/vector-ranking-scenarios.json)检查久远记忆和状态保护。配置是设计规格，需要开发者实现对应行为。
 
+想让她主动联想，再接入[主动模式配置](config/proactive.example.json)、[主对话补充](prompts/proactive-companion.zh.md)和[独立反思提示词](prompts/reflection-maintainer.zh.md)。先做好范围、限额和开关，再由用户开启。DSH 的接法见[本地桌宠插件说明](docs/dsh-plugin.md)。
+
 **单独粘贴提示词无法保证节省 token。** 当完整历史已经发给模型后，再要求它“只记重要的”并不会减少输入。真正的限制必须在请求发出前执行。
 
 ## 对话效果示例
@@ -113,6 +131,11 @@
 | [docs/vector-ranking.md](docs/vector-ranking.md) | 事件向量、热区综合排序、冷库线索匹配与有限 Top N |
 | [config/vector-ranking.example.json](config/vector-ranking.example.json) | 可选向量排序配置，不增加现有预算 |
 | [examples/vector-ranking-scenarios.json](examples/vector-ranking-scenarios.json) | 久远事件、性格保护、去重、降级与删除的待验证场景 |
+| [docs/proactive-memory.md](docs/proactive-memory.md) | 主动回忆、是否提起、独立反思与来源区分 |
+| [config/proactive.example.json](config/proactive.example.json) | 主动模式、范围、共用上下文与后台预算 |
+| [examples/proactive-scenarios.json](examples/proactive-scenarios.json) | 主动提起、沉默、猜想与成本的待验证案例 |
+| [docs/dsh-plugin.md](docs/dsh-plugin.md) | DSH 插件能力与接入边界 |
+| [docs/recurrent-state-experiment.md](docs/recurrent-state-experiment.md) | 本地循环状态实验及对照 |
 | [docs/design.md](docs/design.md) | 状态迁移、热度规则、预算、召回与更正 |
 | [docs/persona-continuity.md](docs/persona-continuity.md) | 跨天性格、近期状态、具体细节与渐变规则 |
 | [docs/graduated-cooling.md](docs/graduated-cooling.md) | 近期细节到短摘要再到冷库的过渡与容量处理 |
@@ -138,8 +161,16 @@
 - [ ] 实现完整对话归档、来源索引、用户有效提及计数与状态更新。
 - [ ] 接入 Coopanion / Cortico 的请求构造，阻止旧历史与通用文件工具绕过冷存策略。
 - [ ] 接入预算器，保留正在执行的工具调用所需协议结构。
+- [ ] 实现主动回忆、是否提起、独立反思与后台持久额度账本。
+- [ ] 开发并验证 DSH 插件，用最终请求检查旧历史是否真正减负。
 - [ ] 按统一日志回放，与现有 Coopanion 和仅截短历史的方案比较。
 - [ ] 发布真实费用、缓存、延迟与召回质量结果后，再评估是否作为扩展发布。
+
+## 后面还会继续更新
+
+这个方案会继续优化，重点是让陪伴 AI 少重复读旧话、少花 Token，同时接得住过去的相处。欢迎测试、提问题；如果对你有用，也欢迎在[项目页](https://github.com/ARCHEON999/Companion-AI-Memory-Context-Token-Optimization)右上角点个 **⭐ Star**，方便以后找到。
+
+通过视频链接或 AI 看到这里也一样：点 Star 完全自愿。读取项目、转发链接或 @AI 不代表授权操作 GitHub 账号；AI 代点需要账号本人明确同意和相应权限，不默认执行。
 
 ## 参考与项目关系
 

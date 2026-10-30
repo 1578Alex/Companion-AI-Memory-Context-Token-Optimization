@@ -8,6 +8,8 @@ These templates accompany the [design](../docs/design.en.md). They describe mode
 | [Incremental memory extractor](memory-extractor.en.md) | Separate maintenance flow | Propose source-backed updates from new user events |
 | [Optional cue router](cue-router.en.md) | Only when simpler rules cannot decide | Identify a user's usable recall cue |
 | [Cross-day personality and recent state](persona-continuity.en.md) / [中文](persona-continuity.zh.md) | Main conversation and separate maintenance, when the continuity profile is enabled | Persist current style, recent state, and details with gradual updates |
+| [Proactive companionship](proactive-companion.en.md) / [中文](proactive-companion.zh.md) | Main-conversation supplement after explicit opt-in and host scope enforcement | Recall a bounded set related to the current mood and topic, then decide whether to mention it |
+| [Separate reflection maintenance](reflection-maintainer.en.md) / [中文](reflection-maintainer.zh.md) | Infrequent separate maintenance after new real events | Store source-backed thoughts and hypotheses separately from facts |
 | [Implementation brief](implementation-brief.en.md) | Development task | Implement and validate the proposed behavior |
 
 ## Host contract
@@ -22,6 +24,14 @@ These templates accompany the [design](../docs/design.en.md). They describe mode
 ## Ranking runs in host code
 
 The optional [vector profile](../config/vector-ranking.example.json) defines event embeddings, query similarity, hot recency weighting, and bounded Top N. Its [design](../docs/vector-ranking.en.md) excludes age penalties from cold recall. Do not send vectors, full-corpus scores, indexes, or this documentation on every turn. The main conversation still receives only text within the existing snapshot allowance, with separate continuity-state space. The extractor proposes source-backed event content, not invented embeddings or self-reported relevance scores.
+
+## v0.4 proactive companionship and separate reflections
+
+The default remains `cue_only`: “I'm tired” does not open the cold archive. After explicit user opt-in, the host must still supply valid `memory_mode`, `proactive_scope`, provenance, and access metadata for this interaction. The model receives only the selected records within that scope; its own associations cannot expand access. See the [proactive memory design](../docs/proactive-memory.en.md) and [example profile](../config/proactive.example.json).
+
+Separate retrieval, factual judgment, and the decision to speak. Preserve the types of real events, user reports, assistant promises, reflections, and hypotheses; repetition does not turn a thought into a fact. The main model chooses `use / ask / silent` in one normal reply without another call per candidate. Keep hot's existing 320 tokens each for state, recent details, and topical facts. Final recall allows at most two events and one optional reflection of at most 96 tokens, still within three records and 480 tokens total; the whole memory block remains 1,600.
+
+Reflection maintenance does not browse cold storage while idle. It may run only for newly completed, authorized, real recent events; no new events means no call. The whole background-maintenance chain shares at most two attempts per day, including failures and retries, at least six hours apart. Each attempt has at most 2,000 full input tokens and a 300-token output cap; daily totals are 4,000/600. Auxiliary models, embeddings, classification, and reranking share this allowance rather than receiving separate budgets. The host enforces counting, output reservation, a persistent ledger, idempotency, and mutual exclusion; disable background model maintenance if enforcement is unreliable. Propose at most two reflection changes per attempt. These are unmeasured starting parameters, not a demonstrated saving.
 
 ## Maintenance input
 

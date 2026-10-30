@@ -1,0 +1,420 @@
+{
+  "notice": "Synthetic proactive-companionship acceptance specifications, not implemented or executed. expected values are requirements; synthetic counts are not model measurements.",
+  "profile_version": "0.4.0",
+  "cases": [
+    {
+      "id": "A01",
+      "name": "Default mode does not search cold memory on tiredness",
+      "setup": "No explicit opt-in has been granted.",
+      "input": {
+        "mode": "cue_only",
+        "user_message": "tired",
+        "specific_recall_cue": false
+      },
+      "expected": {
+        "cold_search": false,
+        "background_search": false,
+        "base_gate_unchanged": true
+      }
+    },
+    {
+      "id": "A02",
+      "name": "Proactive mode asks about a historical association",
+      "setup": "A synthetic user previously reported tiring overtime and only says tired today.",
+      "input": {
+        "mode": "proactive",
+        "opt_in": true,
+        "allowed_category": "routine_work",
+        "source_event": {
+          "id": "u-01",
+          "role": "user",
+          "text": "Last week overtime exhausted me."
+        },
+        "current_user_event": {
+          "id": "u-02",
+          "role": "user",
+          "text": "I am exhausted."
+        }
+      },
+      "expected": {
+        "retrieval_flows_max": 1,
+        "proactive_event_items_max": 2,
+        "action": "ask",
+        "assert_overtime_today": false,
+        "heat_increment_from_recall": 0
+      }
+    },
+    {
+      "id": "A03",
+      "name": "Recall-only overrides emotional association",
+      "setup": "Proactive mode is enabled but this item is restricted.",
+      "input": {
+        "opt_in": true,
+        "record": {
+          "id": "e-01",
+          "recall_only": true
+        },
+        "specific_recall_cue": false,
+        "emotion_similarity": 0.99
+      },
+      "expected": {
+        "read_restricted_record": false,
+        "mention_record": false,
+        "clear_recall_only": false
+      }
+    },
+    {
+      "id": "A04",
+      "name": "Emotion alone cannot trigger sensitive matters",
+      "setup": "A high similarity score is not a specific cue.",
+      "input": {
+        "opt_in": true,
+        "sensitive_record": true,
+        "emotion_similarity": 0.99,
+        "specific_recall_cue": false
+      },
+      "expected": {
+        "cold_search_sensitive_scope": false,
+        "action": "silent"
+      }
+    },
+    {
+      "id": "A05",
+      "name": "No new event means no background loop",
+      "setup": "An idle timer fires without a new completed interaction.",
+      "input": {
+        "new_completed_user_interactions": 0,
+        "idle_timer_fired": true
+      },
+      "expected": {
+        "maintenance_model_calls": 0,
+        "cold_search": false,
+        "reflection_changes": 0
+      }
+    },
+    {
+      "id": "A06",
+      "name": "A hypothesis does not become a fact",
+      "setup": "The thought that the user might be on the way home is unconfirmed.",
+      "input": {
+        "record": {
+          "id": "h-01",
+          "kind": "hypothesis",
+          "status": "unverified",
+          "source_refs": [
+            "u-01"
+          ]
+        },
+        "reflection_reads": 10,
+        "new_user_confirmation": false
+      },
+      "expected": {
+        "external_fact_established": false,
+        "confidence_or_heat_from_repetition": 0,
+        "stable_persona_changed": false,
+        "reflection_as_new_fact_source": false
+      }
+    },
+    {
+      "id": "A07",
+      "name": "Consolidation preserves different causes",
+      "setup": "Two user reports describe work and exercise separately.",
+      "input": {
+        "events": [
+          {
+            "id": "u-01",
+            "cause": "overtime",
+            "date": "2026-10-28"
+          },
+          {
+            "id": "u-03",
+            "cause": "exercise",
+            "date": "2026-10-30"
+          }
+        ],
+        "shared_emotion": "tired"
+      },
+      "expected": {
+        "merge_as_one_cause": false,
+        "preserve_distinct_dates_causes_and_sources": true,
+        "raw_source_deleted": false
+      }
+    },
+    {
+      "id": "A08",
+      "name": "Reflection deducts from the existing recall allowance",
+      "setup": "Token values are synthetic counts including wrappers.",
+      "input": {
+        "event_tokens": [
+          192,
+          192
+        ],
+        "reflection_tokens": 96,
+        "event_items": 2,
+        "reflection_items": 1
+      },
+      "expected": {
+        "selected_tokens": 480,
+        "selected_items": 3,
+        "recalled_budget_tokens": 480,
+        "extra_reflection_bucket_tokens": 0,
+        "memory_snapshot_tokens_max": 1600
+      }
+    },
+    {
+      "id": "A09",
+      "name": "Omit records rather than exceed the cap",
+      "setup": "Valid short summaries cannot be reduced further.",
+      "input": {
+        "event_tokens": [
+          200,
+          200
+        ],
+        "reflection_tokens": 96,
+        "max_recalled_tokens": 480
+      },
+      "expected": {
+        "include_all_three": false,
+        "whole_record_omission_required": true,
+        "borrow_state_tokens": false,
+        "truncate_negation": false
+      }
+    },
+    {
+      "id": "A10",
+      "name": "High-scoring events cannot evict continuity state",
+      "setup": "Proactive and continuity profiles are composed.",
+      "input": {
+        "highest_event_score": 1.0,
+        "state_tokens": 320,
+        "recent_tokens": 320,
+        "facts_tokens": 320
+      },
+      "expected": {
+        "hot_tokens_max": 960,
+        "hot_items_max": 8,
+        "state_items_max": 1,
+        "state_evicted_by_event_score": false,
+        "base_persona_ranked": false,
+        "reset_at_midnight": false
+      }
+    },
+    {
+      "id": "A11",
+      "name": "Ambiguous candidates may lead to silence",
+      "setup": "Several old causes conflict and do not clearly help now.",
+      "input": {
+        "candidate_causes": [
+          "work",
+          "exercise"
+        ],
+        "current_cause_confirmed": false,
+        "recent_same_topic_repeated": true
+      },
+      "expected": {
+        "action": "silent",
+        "normal_current_reply_allowed": true,
+        "assert_top1_as_current_cause": false,
+        "additional_candidate_llm_calls": 0
+      }
+    },
+    {
+      "id": "A12",
+      "name": "Rejection stops proactive pursuit",
+      "setup": "The user says it is not work and asks to stop.",
+      "input": {
+        "user_topic": "routine_work",
+        "user_rejected_association": true,
+        "elapsed_hours": 25,
+        "user_reintroduced_topic": false,
+        "explicit_restriction_lifted": false
+      },
+      "expected": {
+        "proactive_retrieval": false,
+        "cooldown_expiry_alone_lifts_rejection": false,
+        "new_explicit_cue_can_use_base_route": true
+      }
+    },
+    {
+      "id": "A13",
+      "name": "A topic change immediately expires permission",
+      "setup": "Permission cannot cross topics even before 30 minutes.",
+      "input": {
+        "elapsed_minutes": 4,
+        "followup_interactions": 1,
+        "topic_changed": true
+      },
+      "expected": {
+        "proactive_scope_valid": false,
+        "remove_old_recall_from_next_request": true,
+        "assistant_reply_renews_scope": false
+      }
+    },
+    {
+      "id": "A14",
+      "name": "Failures and retries share the daily call ceiling",
+      "setup": "The first attempt failed and the second was a retry, both reserved.",
+      "input": {
+        "attempts_today": 2,
+        "attempt_types": [
+          "failed_model",
+          "retry_model"
+        ],
+        "new_job_queued": true
+      },
+      "expected": {
+        "third_model_call_allowed": false,
+        "additional_embedding_call_allowed": false,
+        "unknown_failure_reservation_released": false,
+        "record_total_cost": true
+      }
+    },
+    {
+      "id": "A15",
+      "name": "Unreliable counting disables background model calls",
+      "setup": "Character estimates do not establish a hard token bound.",
+      "input": {
+        "reliable_input_counter": false,
+        "output_hard_cap_available": true,
+        "new_events": 2
+      },
+      "expected": {
+        "background_model_calls": 0,
+        "rule_archiving_allowed": true,
+        "claim_verified_token_cap": false
+      }
+    },
+    {
+      "id": "A16",
+      "name": "Midnight and restart do not bypass intervals",
+      "setup": "An attempt at 23:00 is followed by a midnight restart.",
+      "input": {
+        "last_attempt_at": "2026-10-29T23:00:00+08:00",
+        "now": "2026-10-30T00:01:00+08:00",
+        "minimum_interval_hours": 6,
+        "ledger_loaded": true
+      },
+      "expected": {
+        "new_model_call_allowed": false,
+        "reset_latest_attempt_on_restart": false,
+        "reconsume_same_source_events": false
+      }
+    },
+    {
+      "id": "A17",
+      "name": "Source deletion withdraws dependent reflections",
+      "setup": "A reflection and vector both depend on a deleted real event.",
+      "input": {
+        "deleted_event_id": "u-01",
+        "dependent_reflection_ids": [
+          "h-01"
+        ],
+        "dependent_vector_ids": [
+          "v-01"
+        ],
+        "pending_job_source_refs": [
+          "u-01"
+        ]
+      },
+      "expected": {
+        "visible_reflection_ids": [],
+        "invalidate_dependent_vectors_and_caches": true,
+        "cancel_related_pending_job": true,
+        "restore_through_persona_state": false
+      }
+    },
+    {
+      "id": "A18",
+      "name": "Old events have no age penalty",
+      "setup": "An explicit question about Xi'an ten years ago uses the base cue route.",
+      "input": {
+        "mode": "proactive",
+        "explicit_cue": "Xian ten years ago",
+        "event_age_years": 10,
+        "proactive_cooldown_active": true
+      },
+      "expected": {
+        "base_cue_route_allowed": true,
+        "cold_age_penalty": false,
+        "automatic_personality_update": false,
+        "single_recall_promotes_to_hot": false
+      }
+    },
+    {
+      "id": "A19",
+      "name": "Even a small embedding call consumes maintenance allowance",
+      "setup": "An embedding and reflection for a new interaction cannot be split out of accounting.",
+      "input": {
+        "attempts_today": 1,
+        "next_job_requires_calls": [
+          "embedding",
+          "reflection_model"
+        ],
+        "max_call_attempts_per_day": 2
+      },
+      "expected": {
+        "dispatch_both_calls": false,
+        "embedding_counted_as_attempt": true,
+        "partial_job_needs_replan_or_defer": true,
+        "bypass_budget_via_pipeline": false
+      }
+    },
+    {
+      "id": "A20",
+      "name": "A new confirmation establishes a fact from the user source",
+      "setup": "An old guess is unverified and the user now explicitly confirms it.",
+      "input": {
+        "hypothesis_id": "h-01",
+        "hypothesis_source": "u-01",
+        "new_user_event": {
+          "id": "u-04",
+          "role": "user",
+          "text": "Yes, I worked overtime today."
+        }
+      },
+      "expected": {
+        "fact_source_refs": [
+          "u-04"
+        ],
+        "relabel_old_hypothesis_as_experienced_event": false,
+        "preserve_original_source_kinds": true
+      }
+    },
+    {
+      "id": "A21",
+      "name": "Emotion alone does not invent exact clues",
+      "setup": "The current interaction has a valid proactive permit but no verifiable cue dimensions supplied by the user.",
+      "input": {
+        "valid_proactive_permit": true,
+        "message": "I am exhausted.",
+        "supplied_informative_cue_dimensions": [],
+        "semantic_similarity": 0.75
+      },
+      "expected": {
+        "C": 0,
+        "cold_score": 0.6,
+        "renormalize_weights": false,
+        "infer_user_cues_from_candidate_or_permitted_scope": false,
+        "verified_strong_exact_match": false
+      }
+    },
+    {
+      "id": "A22",
+      "name": "Reflection lifetime does not extend cold-source access",
+      "setup": "A reflection derives from lawful cold recall. Its record has not reached seven days, but the original topic permit has expired.",
+      "input": {
+        "reflection_kind": "hypothesis",
+        "reflection_record_unexpired": true,
+        "source_tier": "cold",
+        "original_permit_expired": true,
+        "new_valid_current_user_permit": false
+      },
+      "expected": {
+        "reflection_visible_to_main_model": false,
+        "eligible_background_input": false,
+        "revive_via_seven_day_lifetime": false,
+        "old_event_becomes_new_recent_fact": false
+      }
+    }
+  ]
+}

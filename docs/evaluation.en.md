@@ -114,3 +114,11 @@ Replay the [vector cases](../examples/vector-ranking-scenarios.en.json): a match
 Bucket queries by event age and report Recall@N, incorrect recalls, and the average number of follow-up cues in each bucket. Separately report missing vectors, unknown event times, and approximate-index misses. Changing only an event's age or last-mention time must not change its cold score; changing the user's requested year can change which records qualify. Synthetic arithmetic does not measure real semantic retrieval.
 
 Extend cross-day blind review: verify the source of yesterday's subdued tone, unresolved matters not being marked resolved, restored familiarity, and natural responses to new circumstances. Compare P15–P17 and the actual first outbound request. Convincing characterization needs human evaluation; storing an emotion value alone does not establish it.
+
+## 9. v0.4 proactive companionship and background budgets
+
+Continue base S/P/C/V cases in default cue_only mode and use `examples/proactive-scenarios.en.json` for the extension. Under the same model, character, and 1,600-token memory allowance, compare cued mode, proactive recall without reflection, and proactive recall with bounded reflection. Do not bundle recurrent-state experiments with these changes and confound attribution.
+
+Measure acceptance of proactive mentions, incorrect cause attribution, repeated questions, failures to remain silent, guesses promoted to facts, abrupt cross-day tone changes, residual deleted sources, and recent-detail recovery. Aggregate all usage, cost, and latency for main replies, helpers, embeddings, reflection, and failed retries by user and day. Daily background costs cannot disappear or be attributed only to the last chat.
+
+Use a controlled clock for no-new-event skipping, the six-hour interval, daily call/input/output limits, durable restart counters, locks, and idempotent replays. Disable background model work without reliable accounting. Expression decisions share the answer's generation and output/reasoning budget; hidden reasoning is not free. Synthetic specifications and configuration consistency are not real-model behavior tests.

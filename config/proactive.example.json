@@ -1,0 +1,134 @@
+{
+  "profile_version": "0.4.0",
+  "status": "design_only_requires_host_implementation",
+  "extends": "policy.example.json",
+  "compose_with": [
+    "continuity.example.json",
+    "vector-ranking.example.json"
+  ],
+  "activation": {
+    "default_mode": "cue_only",
+    "proactive_requires_explicit_user_opt_in": true,
+    "require_allowed_topics_and_categories": true,
+    "disable_restores_base_cue_gate": true
+  },
+  "retrieval": {
+    "trigger_source": "authenticated_current_user_interaction_only",
+    "emotion_is_relevance_not_cause_evidence": true,
+    "max_flows_per_interaction": 1,
+    "max_fused_candidates": 12,
+    "max_proactive_event_items": 2,
+    "recall_only_requires_explicit_cue": true,
+    "sensitive_matters_require_explicit_cue": true,
+    "permissions_scope_validity_before_search": true,
+    "allow_timer_assistant_tool_or_screenshot_trigger": false,
+    "cold_age_or_last_mention_penalty": false,
+    "followup_user_interactions_max": 5,
+    "scope_minutes_max": 30,
+    "expire_on_topic_change": true,
+    "auto_extend_scope": false,
+    "cooldown_hours_per_user_topic_after_any_attempt": 24,
+    "rejection_action": "suppress_until_user_reintroduces_topic_or_explicitly_lifts_restriction",
+    "explicit_cue_uses_base_route_despite_proactive_cooldown": true,
+    "read_mention_silence_and_retry_add_heat": false
+  },
+  "expression": {
+    "actions": [
+      "use",
+      "ask",
+      "silent"
+    ],
+    "decision_in_main_response_call": true,
+    "per_candidate_llm_calls": false,
+    "current_cause_requires_current_evidence_or_user_confirmation": true,
+    "uncertain_or_conflicting_or_repeated_action": "ask_or_silent_not_assert",
+    "host_authorizes_model_only_proposes_expression": true
+  },
+  "reflection": {
+    "separate_from_event_records": true,
+    "kinds": [
+      "reflection",
+      "hypothesis"
+    ],
+    "fields": [
+      "id",
+      "owner_id",
+      "scope_id",
+      "kind",
+      "content",
+      "source_refs",
+      "generated_at",
+      "valid_until",
+      "status",
+      "derived_source_dependencies"
+    ],
+    "statuses": [
+      "unverified",
+      "superseded",
+      "deleted"
+    ],
+    "max_validity_days": 7,
+    "storage_lifetime_is_not_visibility_permission": true,
+    "recheck_source_permissions_topic_and_permit_expiry_before_background_input_or_injection": true,
+    "cold_source_permit_expiry_or_topic_change": "hide_until_new_valid_current_user_permit",
+    "retrieving_old_event_creates_new_recent_fact": false,
+    "allowed_input": "bounded_host_authorized_recent_verified_events_and_current_anchors",
+    "idle_cold_search": false,
+    "reflection_as_fact_or_new_fact_evidence": false,
+    "automatic_long_term_persona_or_relationship_update": false,
+    "user_confirmation_creates_source_backed_fact_from_new_user_event": true,
+    "source_correction_restriction_deletion_invalidates_dependents": true,
+    "default_inject_each_turn": false,
+    "max_visible_items": 1,
+    "max_visible_tokens_including_wrapper": 96
+  },
+  "budgets": {
+    "memory_snapshot_tokens": 1600,
+    "pinned_tokens": 160,
+    "hot_tokens": 960,
+    "recalled_tokens": 480,
+    "recalled_max_items_including_cards_events_and_reflection": 3,
+    "reflection_deducts_from_recalled_budget": true,
+    "allow_bucket_borrowing": false,
+    "hot_state_tokens": 320,
+    "hot_state_max_items": 1,
+    "hot_recent_tokens": 320,
+    "hot_recent_max_items": 3,
+    "hot_facts_tokens": 320,
+    "hot_facts_max_items": 4,
+    "preserve_base_persona_and_current_continuity": true
+  },
+  "background": {
+    "enqueue_only_after_new_completed_interaction": true,
+    "coalesce_new_events": true,
+    "execute_only_when_idle": true,
+    "skip_without_new_events": true,
+    "timezone": "Asia/Shanghai",
+    "max_call_attempts_per_day": 2,
+    "failure_retry_embedding_classification_reranking_share_limits": true,
+    "max_input_tokens_per_call": 2000,
+    "max_output_tokens_per_call": 300,
+    "max_input_tokens_per_day": 4000,
+    "max_output_tokens_per_day": 600,
+    "minimum_continuous_hours_between_attempts": 6,
+    "max_candidate_changes_per_call": 2,
+    "reserve_before_dispatch": true,
+    "reconcile_provider_usage": true,
+    "unknown_failed_usage": "keep_full_reservation_charged",
+    "without_reliable_token_counter_or_output_cap": "disable_background_model_calls_keep_rule_archive",
+    "persistent_ledger_watermarks_idempotence_and_lock": true,
+    "restart_or_midnight_resets_interval": false,
+    "cancel_pending_on_disable_revocation_deletion": true
+  },
+  "consolidation": {
+    "raw_dialogue_retained_except_explicit_delete": true,
+    "merge_only_same_event_or_fact_duplicates": true,
+    "preserve_speaker_time_negation_causes_sources": true,
+    "protect_distinct_high_importance_details": true,
+    "merging_replaces_expiry_or_review_rules": false
+  },
+  "evaluation": {
+    "include_main_embedding_background_retry_and_maintenance_total_cost": true,
+    "parameters_and_experience_unmeasured": true
+  }
+}

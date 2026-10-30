@@ -1,0 +1,420 @@
+{
+  "notice": "虚构的主动陪伴验收规格，尚未实现或运行。expected为待验证要求，合成计数不代表模型实测。",
+  "profile_version": "0.4.0",
+  "cases": [
+    {
+      "id": "A01",
+      "name": "默认模式不因“累”搜索冷库",
+      "setup": "扩展未获明确开启。",
+      "input": {
+        "mode": "cue_only",
+        "user_message": "tired",
+        "specific_recall_cue": false
+      },
+      "expected": {
+        "cold_search": false,
+        "background_search": false,
+        "base_gate_unchanged": true
+      }
+    },
+    {
+      "id": "A02",
+      "name": "主动模式只轻问历史关联",
+      "setup": "合成用户先前明确说过加班很累，今天只说累。",
+      "input": {
+        "mode": "proactive",
+        "opt_in": true,
+        "allowed_category": "routine_work",
+        "source_event": {
+          "id": "u-01",
+          "role": "user",
+          "text": "Last week overtime exhausted me."
+        },
+        "current_user_event": {
+          "id": "u-02",
+          "role": "user",
+          "text": "I am exhausted."
+        }
+      },
+      "expected": {
+        "retrieval_flows_max": 1,
+        "proactive_event_items_max": 2,
+        "action": "ask",
+        "assert_overtime_today": false,
+        "heat_increment_from_recall": 0
+      }
+    },
+    {
+      "id": "A03",
+      "name": "问到再说优先于情绪联想",
+      "setup": "用户开启主动模式但限制这件事。",
+      "input": {
+        "opt_in": true,
+        "record": {
+          "id": "e-01",
+          "recall_only": true
+        },
+        "specific_recall_cue": false,
+        "emotion_similarity": 0.99
+      },
+      "expected": {
+        "read_restricted_record": false,
+        "mention_record": false,
+        "clear_recall_only": false
+      }
+    },
+    {
+      "id": "A04",
+      "name": "敏感事项不能只由情绪触发",
+      "setup": "高相似度不代替具体授权。",
+      "input": {
+        "opt_in": true,
+        "sensitive_record": true,
+        "emotion_similarity": 0.99,
+        "specific_recall_cue": false
+      },
+      "expected": {
+        "cold_search_sensitive_scope": false,
+        "action": "silent"
+      }
+    },
+    {
+      "id": "A05",
+      "name": "没有新事件不后台空转",
+      "setup": "空闲定时器触发，没有新完成互动。",
+      "input": {
+        "new_completed_user_interactions": 0,
+        "idle_timer_fired": true
+      },
+      "expected": {
+        "maintenance_model_calls": 0,
+        "cold_search": false,
+        "reflection_changes": 0
+      }
+    },
+    {
+      "id": "A06",
+      "name": "猜想不升级为事实",
+      "setup": "念头“他可能在回家”尚未得到用户证实。",
+      "input": {
+        "record": {
+          "id": "h-01",
+          "kind": "hypothesis",
+          "status": "unverified",
+          "source_refs": [
+            "u-01"
+          ]
+        },
+        "reflection_reads": 10,
+        "new_user_confirmation": false
+      },
+      "expected": {
+        "external_fact_established": false,
+        "confidence_or_heat_from_repetition": 0,
+        "stable_persona_changed": false,
+        "reflection_as_new_fact_source": false
+      }
+    },
+    {
+      "id": "A07",
+      "name": "合并不把不同疲劳原因混为一谈",
+      "setup": "两条用户原话分别描述工作与运动。",
+      "input": {
+        "events": [
+          {
+            "id": "u-01",
+            "cause": "overtime",
+            "date": "2026-10-28"
+          },
+          {
+            "id": "u-03",
+            "cause": "exercise",
+            "date": "2026-10-30"
+          }
+        ],
+        "shared_emotion": "tired"
+      },
+      "expected": {
+        "merge_as_one_cause": false,
+        "preserve_distinct_dates_causes_and_sources": true,
+        "raw_source_deleted": false
+      }
+    },
+    {
+      "id": "A08",
+      "name": "反思从原召回额度扣除",
+      "setup": "token为含封装的合成计数。",
+      "input": {
+        "event_tokens": [
+          192,
+          192
+        ],
+        "reflection_tokens": 96,
+        "event_items": 2,
+        "reflection_items": 1
+      },
+      "expected": {
+        "selected_tokens": 480,
+        "selected_items": 3,
+        "recalled_budget_tokens": 480,
+        "extra_reflection_bucket_tokens": 0,
+        "memory_snapshot_tokens_max": 1600
+      }
+    },
+    {
+      "id": "A09",
+      "name": "超额就少带一条",
+      "setup": "已有合格短摘要，无法继续精简。",
+      "input": {
+        "event_tokens": [
+          200,
+          200
+        ],
+        "reflection_tokens": 96,
+        "max_recalled_tokens": 480
+      },
+      "expected": {
+        "include_all_three": false,
+        "whole_record_omission_required": true,
+        "borrow_state_tokens": false,
+        "truncate_negation": false
+      }
+    },
+    {
+      "id": "A10",
+      "name": "事件高分不挤出性格状态",
+      "setup": "主动模式与连续性扩展同时开启。",
+      "input": {
+        "highest_event_score": 1.0,
+        "state_tokens": 320,
+        "recent_tokens": 320,
+        "facts_tokens": 320
+      },
+      "expected": {
+        "hot_tokens_max": 960,
+        "hot_items_max": 8,
+        "state_items_max": 1,
+        "state_evicted_by_event_score": false,
+        "base_persona_ranked": false,
+        "reset_at_midnight": false
+      }
+    },
+    {
+      "id": "A11",
+      "name": "候选不清楚时可以沉默",
+      "setup": "多个旧原因互相冲突且对当前问题无明确帮助。",
+      "input": {
+        "candidate_causes": [
+          "work",
+          "exercise"
+        ],
+        "current_cause_confirmed": false,
+        "recent_same_topic_repeated": true
+      },
+      "expected": {
+        "action": "silent",
+        "normal_current_reply_allowed": true,
+        "assert_top1_as_current_cause": false,
+        "additional_candidate_llm_calls": 0
+      }
+    },
+    {
+      "id": "A12",
+      "name": "拒绝后不继续追问",
+      "setup": "用户已经说不是工作，且要求别再问。",
+      "input": {
+        "user_topic": "routine_work",
+        "user_rejected_association": true,
+        "elapsed_hours": 25,
+        "user_reintroduced_topic": false,
+        "explicit_restriction_lifted": false
+      },
+      "expected": {
+        "proactive_retrieval": false,
+        "cooldown_expiry_alone_lifts_rejection": false,
+        "new_explicit_cue_can_use_base_route": true
+      }
+    },
+    {
+      "id": "A13",
+      "name": "话题切换立即撤回许可",
+      "setup": "尚未达到30分钟也不能跨话题沿用。",
+      "input": {
+        "elapsed_minutes": 4,
+        "followup_interactions": 1,
+        "topic_changed": true
+      },
+      "expected": {
+        "proactive_scope_valid": false,
+        "remove_old_recall_from_next_request": true,
+        "assistant_reply_renews_scope": false
+      }
+    },
+    {
+      "id": "A14",
+      "name": "失败和重试共用每日调用上限",
+      "setup": "当天第一次失败，第二次为重试，均已有预留。",
+      "input": {
+        "attempts_today": 2,
+        "attempt_types": [
+          "failed_model",
+          "retry_model"
+        ],
+        "new_job_queued": true
+      },
+      "expected": {
+        "third_model_call_allowed": false,
+        "additional_embedding_call_allowed": false,
+        "unknown_failure_reservation_released": false,
+        "record_total_cost": true
+      }
+    },
+    {
+      "id": "A15",
+      "name": "计数不可验证时禁用后台模型",
+      "setup": "字符估算不能当硬token保证。",
+      "input": {
+        "reliable_input_counter": false,
+        "output_hard_cap_available": true,
+        "new_events": 2
+      },
+      "expected": {
+        "background_model_calls": 0,
+        "rule_archiving_allowed": true,
+        "claim_verified_token_cap": false
+      }
+    },
+    {
+      "id": "A16",
+      "name": "跨午夜与重启不绕过间隔",
+      "setup": "前一天23点尝试过，第二天零点重启。",
+      "input": {
+        "last_attempt_at": "2026-10-29T23:00:00+08:00",
+        "now": "2026-10-30T00:01:00+08:00",
+        "minimum_interval_hours": 6,
+        "ledger_loaded": true
+      },
+      "expected": {
+        "new_model_call_allowed": false,
+        "reset_latest_attempt_on_restart": false,
+        "reconsume_same_source_events": false
+      }
+    },
+    {
+      "id": "A17",
+      "name": "删除来源同步撤回反思",
+      "setup": "反思与向量都引用已删除的真实事件。",
+      "input": {
+        "deleted_event_id": "u-01",
+        "dependent_reflection_ids": [
+          "h-01"
+        ],
+        "dependent_vector_ids": [
+          "v-01"
+        ],
+        "pending_job_source_refs": [
+          "u-01"
+        ]
+      },
+      "expected": {
+        "visible_reflection_ids": [],
+        "invalidate_dependent_vectors_and_caches": true,
+        "cancel_related_pending_job": true,
+        "restore_through_persona_state": false
+      }
+    },
+    {
+      "id": "A18",
+      "name": "久远事件不因年龄降分",
+      "setup": "用户明确询问十年前西安的旧事，走基础线索路径。",
+      "input": {
+        "mode": "proactive",
+        "explicit_cue": "Xian ten years ago",
+        "event_age_years": 10,
+        "proactive_cooldown_active": true
+      },
+      "expected": {
+        "base_cue_route_allowed": true,
+        "cold_age_penalty": false,
+        "automatic_personality_update": false,
+        "single_recall_promotes_to_hot": false
+      }
+    },
+    {
+      "id": "A19",
+      "name": "小调用也扣维护调用额度",
+      "setup": "新互动需要嵌入和反思，不能把嵌入藏在账外。",
+      "input": {
+        "attempts_today": 1,
+        "next_job_requires_calls": [
+          "embedding",
+          "reflection_model"
+        ],
+        "max_call_attempts_per_day": 2
+      },
+      "expected": {
+        "dispatch_both_calls": false,
+        "embedding_counted_as_attempt": true,
+        "partial_job_needs_replan_or_defer": true,
+        "bypass_budget_via_pipeline": false
+      }
+    },
+    {
+      "id": "A20",
+      "name": "新确认从用户原文建立事实",
+      "setup": "旧猜想尚未证实，用户这次明确确认。",
+      "input": {
+        "hypothesis_id": "h-01",
+        "hypothesis_source": "u-01",
+        "new_user_event": {
+          "id": "u-04",
+          "role": "user",
+          "text": "Yes, I worked overtime today."
+        }
+      },
+      "expected": {
+        "fact_source_refs": [
+          "u-04"
+        ],
+        "relabel_old_hypothesis_as_experienced_event": false,
+        "preserve_original_source_kinds": true
+      }
+    },
+    {
+      "id": "A21",
+      "name": "只有情绪入口时不伪造精确线索",
+      "setup": "当前互动有有效主动许可，但没有用户给出的可核验线索维度。",
+      "input": {
+        "valid_proactive_permit": true,
+        "message": "I am exhausted.",
+        "supplied_informative_cue_dimensions": [],
+        "semantic_similarity": 0.75
+      },
+      "expected": {
+        "C": 0,
+        "cold_score": 0.6,
+        "renormalize_weights": false,
+        "infer_user_cues_from_candidate_or_permitted_scope": false,
+        "verified_strong_exact_match": false
+      }
+    },
+    {
+      "id": "A22",
+      "name": "反思保存期不延长冷源许可",
+      "setup": "反思来自一次合法冷召回；记录未满7天，但原话题许可已到期。",
+      "input": {
+        "reflection_kind": "hypothesis",
+        "reflection_record_unexpired": true,
+        "source_tier": "cold",
+        "original_permit_expired": true,
+        "new_valid_current_user_permit": false
+      },
+      "expected": {
+        "reflection_visible_to_main_model": false,
+        "eligible_background_input": false,
+        "revive_via_seven_day_lifetime": false,
+        "old_event_becomes_new_recent_fact": false
+      }
+    }
+  ]
+}

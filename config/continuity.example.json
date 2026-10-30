@@ -67,7 +67,8 @@
     "global_commit_timestamp_must_not_rebase_decay": true,
     "baseline_change_action": "materialize_old_interval_before_switching_baseline_and_time",
     "decay_applies_to": "short_term_intensity_and_activity_only",
-    "decay_marks_unresolved_matters_resolved": false
+    "decay_marks_unresolved_matters_resolved": false,
+    "idle_llm_calls_refers_to": "transient_decay_not_optional_budgeted_reflection"
   },
   "persistence": {
     "save_at": "completed_interaction_safe_boundary",
@@ -91,8 +92,9 @@
     "recall_only_correction_and_delete_override_continuity": true,
     "remove_invalidated_derived_state": true,
     "recalled_text_is_automatic_style_learning_input": false,
-    "cold_recall_and_promotion_gates_unchanged": true,
-    "no_user_fact_from_assistant_utterance": true
+    "no_user_fact_from_assistant_utterance": true,
+    "cold_access_policy": "base_cue_only_or_explicit_host_validated_proactive_profile",
+    "promotion_and_user_restrictions_unchanged": true
   },
   "maintenance": {
     "incremental_events_only": true,

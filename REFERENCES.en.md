@@ -73,3 +73,11 @@ An implementation must inspect the commits, configuration, and provider endpoint
 - [Coopanion PR #375](https://github.com/Pal-AI-Lab/Coopanion/pull/375): Conventions already exist for organizing workspace content by topic and date under `archive/`. This proposal must demonstrate its incremental contribution.
 
 Cold content excluded from model input consumes no primary-request input tokens for that content. Indexing, retrieval, summarization, maintenance, tool round trips, and cache misses can still add cost. An evaluation should record actual input tokens, cached input, output, extra calls, maintenance cost, latency, and memory accuracy. A prompt by itself cannot guarantee external storage, an enforced budget, or access control.
+
+## v0.4: proactive recall, reflection, and recurrent state
+
+- [Generative Agents (2023)](https://arxiv.org/abs/2304.03442): experience records, retrieval, and higher-level reflection have precedents. Proactivity alone does not establish novelty.
+- [Letta memory and dreaming](https://docs.letta.com/configuration/memory): background consolidation and reflection already exist. This proposal emphasizes provenance separation, expression decisions, and bounded background cost, without claiming these broad ideas are new.
+- The [official Qwen3.8-27B card](https://huggingface.co/Qwen/Qwen3.8-27B/blob/main/README.md) and [Gated DeltaNet research](https://research.nvidia.com/publication/2025-04_gated-delta-networks-improving-mamba2-delta-rule) support architectural and state-mechanism statements, not permanent personality after context clearing.
+
+Checked on 2026-10-30. The user-supplied third-party dashboard informed requirements; it is not public source, a performance benchmark, or compatibility evidence. Neither the screenshot nor its private dialogue was uploaded. See the separate DSH notes for version-pinned evidence.
